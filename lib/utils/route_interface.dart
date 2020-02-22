@@ -1,0 +1,3 @@
+class IRouteInterface{
+  String routeName;
+}
