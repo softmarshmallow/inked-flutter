@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/screen/content_detail_screen.dart';
 
 class NewsListView extends StatefulWidget {
   @override
@@ -26,15 +27,14 @@ class _NewsListView extends State<NewsListView> {
 // region child
 class NewsListItem extends StatelessWidget {
   final News data;
-
   NewsListItem(this.data);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: _onTap,
-        onDoubleTap: _onDoubleTap,
-        onLongPress: _onLongPress,
+        onTap: (){_onTap();},
+        onDoubleTap: (){_onDoubleTap(context);},
+        onLongPress: (){_onLongPress();},
         child: Container(
           padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
           height: 100,
@@ -100,7 +100,9 @@ class NewsListItem extends StatelessWidget {
 
   void _onTap() {}
 
-  void _onDoubleTap() {}
+  void _onDoubleTap(BuildContext context) {
+    Navigator.of(context).pushNamed(ContentDetailScreen.routeName, arguments: data);
+  }
 
   void _onLongPress() {}
 }

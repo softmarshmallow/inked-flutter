@@ -1,3 +1,3 @@
 class IRouteInterface{
-  String routeName;
+  static String routeName;
 }

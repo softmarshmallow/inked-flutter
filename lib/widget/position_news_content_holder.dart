@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:inked/data/local/mock/mock_news_db.dart';
+import 'package:inked/data/model/news.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/widget/content_detail.dart';
 
@@ -15,15 +19,16 @@ class _PositionedNewsContentHolder extends State<PositionedNewsContentHolder> {
     return Align(
       alignment: FractionalOffset.bottomCenter,
       child: Container(
-        height: 400,
+        height: _desiredHeight(),
         decoration: BoxDecoration(
           color: Theme.of(context).canvasColor,
-          border: Border.symmetric(
-              vertical: BorderSide(width: 4, color: Colors.blueAccent)),
         ),
         child: Stack(
           children: <Widget>[
-            ContentDetailView(),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: ContentDetailView(MockNewsDatabase.allNewsDataList[0]),
+            ),
             _buildKnob(),
           ],
         ),
@@ -31,16 +36,36 @@ class _PositionedNewsContentHolder extends State<PositionedNewsContentHolder> {
     );
   }
 
-  Widget _buildKnob() {
-    return GestureDetector(
-      onVerticalDragUpdate: onVerticalDragUpdate,
-      child: Container(
-        width: 50,
-        height: 16,
-        color: Colors.black,
-      ),
-    );
+  static const double minHeight = 80.0;
+  double _desiredHeight() {
+    if (_globalDragPositionY == null) {
+      return 400;
+    } else {
+      double height = MediaQuery.of(context).size.height;
+      double desired = height - _globalDragPositionY;
+      return max<double>(minHeight, desired);
+    }
   }
 
-  void onVerticalDragUpdate(DragUpdateDetails update) {}
+  Widget _buildKnob() {
+    return GestureDetector(
+        onVerticalDragUpdate: onVerticalDragUpdate,
+        child: Align(
+          alignment: Alignment(0.0, -1),
+          child: Container(
+            width: double.infinity,
+            height: 16,
+            decoration: BoxDecoration(
+                color: Colors.black),
+          ),
+        ));
+  }
+
+  double _globalDragPositionY;
+
+  void onVerticalDragUpdate(DragUpdateDetails update) {
+    setState(() {
+      _globalDragPositionY = update.globalPosition.dy;
+    });
+  }
 }

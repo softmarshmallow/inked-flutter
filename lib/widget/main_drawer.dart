@@ -14,7 +14,17 @@ Widget buildMainDrawer(BuildContext context) {
           ),
         ),
         ListTile(
-          title: Text('Watch dogs'),
+          leading: Icon(Icons.filter_list),
+          title: Text('filter'),
+          onTap: () {
+            // Update the state of the app.
+            // ...
+          },
+        ),
+
+        ListTile(
+          leading: Icon(Icons.inbox),
+          title: Text('saved'),
           onTap: () {
             // Update the state of the app.
             // ...
