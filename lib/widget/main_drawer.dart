@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:inked/screen/filter_settings_screen.dart';
 
 Widget buildMainDrawer(BuildContext context) {
   return Drawer(
@@ -17,8 +18,7 @@ Widget buildMainDrawer(BuildContext context) {
           leading: Icon(Icons.filter_list),
           title: Text('filter'),
           onTap: () {
-            // Update the state of the app.
-            // ...
+            Navigator.of(context).pushNamed(FilterSettingsScreen.routeName);
           },
         ),
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/utils/routes.dart';
@@ -5,13 +7,30 @@ import 'package:inked/widget/content_detail.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
+import 'package:firebase/firebase.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(App());
+}
 
-class MyApp extends StatelessWidget {
+Future<void> initFirebaseWeb(BuildContext context) async {
+  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
+  final jsonResult = json.decode(data);
+  if (apps.isEmpty) {
+    initializeApp(
+      apiKey: jsonResult['apiKey'],
+      authDomain: jsonResult['authDomain'],
+      databaseURL: jsonResult['databaseURL'],
+      projectId: jsonResult['projectId'],
+      storageBucket: jsonResult['storageBucket'],);
+  }
+}
+
+class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    initFirebaseWeb(context);
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
