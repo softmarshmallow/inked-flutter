@@ -41,7 +41,7 @@ class _ContentDetailView extends State<ContentDetailView> {
 
   Widget _buildContentSection() {
     return Html(
-      data: MockNewsDatabase.html_example,
+      data: widget.news.content,
       padding: EdgeInsets.all(12),
     );
   }
