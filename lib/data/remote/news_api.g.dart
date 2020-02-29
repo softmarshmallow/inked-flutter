@@ -9,7 +9,8 @@ part of 'news_api.dart';
 class _NewsApi implements NewsApi {
   _NewsApi(this._dio, {this.baseUrl}) {
     ArgumentError.checkNotNull(_dio, '_dio');
-    this.baseUrl ??= 'http://localhost:8000/api/';
+    this.baseUrl ??=
+        'http://ec2-13-209-8-53.ap-northeast-2.compute.amazonaws.com:8001/api/';
   }
 
   final Dio _dio;
@@ -18,26 +19,60 @@ class _NewsApi implements NewsApi {
 
   @override
   getNews() async {
-    try{
-      const _extra = <String, dynamic>{};
-      final queryParameters = <String, dynamic>{};
-      final _data = <String, dynamic>{};
-      final Response<List<dynamic>> _result = await _dio.request('/news',
-          queryParameters: queryParameters,
-          options: RequestOptions(
-              method: 'GET',
-              headers: <String, dynamic>{},
-              extra: _extra,
-              baseUrl: baseUrl),
-          data: _data);
-      var value = _result.data
-          .map((dynamic i) => News.fromJson(i as Map<String, dynamic>))
-          .toList();
-      return Future.value(value);
-    }catch(e){
-      print(e);
-    }
-    return [];
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final Response<List<dynamic>> _result = await _dio.request('/news',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    var value = _result.data
+        .map((dynamic i) => News.fromJson(i as Map<String, dynamic>))
+        .toList();
+    return Future.value(value);
+  }
 
+  @override
+  getNewsItem(id) async {
+    ArgumentError.checkNotNull(id, 'id');
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final Response<List<dynamic>> _result = await _dio.request('/news/$id',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    var value = _result.data
+        .map((dynamic i) => News.fromJson(i as Map<String, dynamic>))
+        .toList();
+    return Future.value(value);
+  }
+
+  @override
+  getLastNews({page = '1', count = 100}) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{'page': page, 'count': count};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    final Response<List<dynamic>> _result = await _dio.request('/news/recent',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    var value = _result.data
+        .map((dynamic i) => News.fromJson(i as Map<String, dynamic>))
+        .toList();
+    return Future.value(value);
   }
 }

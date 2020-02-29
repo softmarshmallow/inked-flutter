@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/utils/routes.dart';
 import 'package:inked/widget/content_detail.dart';
@@ -65,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
         drawer: buildMainDrawer(context),
         body: Stack(
           children: <Widget>[
-            NewsListView(),
-            PositionedNewsContentHolder()
+            LiveNewsListView(),
+//            PositionedNewsContentHolder()
           ],
         ));
   }

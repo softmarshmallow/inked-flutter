@@ -1,50 +1,85 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/news_api.dart';
+import 'package:inked/data/remote/realtime_news_receiver.dart';
 import 'package:inked/screen/content_detail_screen.dart';
+import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 final logger = Logger();
 
-class NewsListView extends StatefulWidget {
+class LiveNewsListView extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _NewsListView();
+  State<StatefulWidget> createState() => _LiveNewsListView();
 }
 
-class _NewsListView extends State<NewsListView> {
+const LIST_MAX = 1000;
+
+class _LiveNewsListView extends State<LiveNewsListView> {
   final Dio dio = Dio();
   NewsApi _api;
   List<News> news = [];
 
-  _NewsListView() {
+  _LiveNewsListView() {
     _api = NewsApi(dio);
-    _api.getNews().then((value) {
-      print("value: $value");
+    _api.getLastNews().then((value) {
       setState(() {
         news = value;
       });
-    }).catchError((Object obj) {
-      // non-200 error goes here.
-      switch (obj.runtimeType) {
-        case DioError:
-          // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("res: $res");
-          logger.e("Got error : ${res.statusCode} -> ${res.statusMessage}");
-          break;
-        default:
-      }
+    }).catchError((e){
+      print(e);
+    });
+    RealtimeNewsReceiver().channel.stream.listen((event) {
+      var parsedJson = json.decode(event);
+      var newsItem = News.fromJson(parsedJson['news']);
+      setState(() {
+        news.add(newsItem);
+        if (news.length > LIST_MAX) {
+          news.removeRange(0, news.length - LIST_MAX);
+        }
+      });
+    });
+
+    // event stream test
+    RealtimeNewsReceiver().eventSource.then((value) => (stream){
+      stream.listen((event) {
+        print(event);
+        var parsedJson = json.decode(event);
+        var newsItem = News.fromJson(parsedJson['news']);
+        setState(() {
+          news.add(newsItem);
+          if (news.length > LIST_MAX) {
+            news.removeRange(0, news.length - LIST_MAX);
+          }
+        });
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    return NewsListView(news);
+  }
+}
+
+class NewsListView extends StatelessWidget {
+  final List<News> news;
+  final ItemScrollController _scrollController = ItemScrollController();
+
+  NewsListView(this.news, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Scrollbar(
-        child: ListView.builder(
+        child: ScrollablePositionedList.builder(
+      itemScrollController: _scrollController,
       itemCount: news.length,
       itemBuilder: (context, index) {
         var isFocused = index == 3;
@@ -52,12 +87,17 @@ class _NewsListView extends State<NewsListView> {
       },
     ));
   }
+
+  _scrollToFocused(){
+    _scrollController.jumpTo(index: 12);
+  }
 }
 
 // region child
 class NewsListItem extends StatelessWidget {
   final News data;
   final bool isFocused;
+
   NewsListItem(this.data, {this.isFocused = false});
 
   @override
@@ -144,14 +184,6 @@ class NewsListItem extends StatelessWidget {
   }
 
   void _onLongPress(BuildContext context) {
-    _launchURL(String url) async {
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        throw 'Could not launch $url';
-      }
-    }
-
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -168,7 +200,7 @@ class NewsListItem extends StatelessWidget {
                   ListTile(
                     title: Text("open news from site"),
                     onTap: () {
-                      _launchURL(data.originUrl);
+                      safelyLaunchURL(data.originUrl);
                     },
                   ),
                 ],

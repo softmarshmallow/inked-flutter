@@ -16,7 +16,7 @@ class News{
   @JsonKey(name: 'origin_url')
   String originUrl;
   @JsonKey(name: 'time')
-  DateTime time;
+  DateTime time = DateTime.now();
   @JsonKey(ignore: true)
   List<String> tags = [];
 
