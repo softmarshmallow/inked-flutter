@@ -6,7 +6,8 @@ part 'news.g.dart';
 class News{
 
   News({this.title, this.content, this.provider, this.time, this.tags});
-
+  @JsonKey(name: 'article_id')
+  String id;
   @JsonKey(name: 'title')
   String title;
   @JsonKey(name: 'body_html')

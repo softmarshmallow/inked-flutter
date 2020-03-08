@@ -9,8 +9,7 @@ part of 'news_api.dart';
 class _NewsApi implements NewsApi {
   _NewsApi(this._dio, {this.baseUrl}) {
     ArgumentError.checkNotNull(_dio, '_dio');
-    this.baseUrl ??=
-        'http://ec2-13-209-8-53.ap-northeast-2.compute.amazonaws.com:8001/api/';
+    this.baseUrl ??= 'http://13.209.232.176:8001/api/';
   }
 
   final Dio _dio;

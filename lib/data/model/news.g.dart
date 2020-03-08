@@ -12,10 +12,13 @@ News _$NewsFromJson(Map<String, dynamic> json) {
     content: json['body_html'] as String,
     provider: json['provider'] as String,
     time: json['time'] == null ? null : DateTime.parse(json['time'] as String),
-  )..originUrl = json['origin_url'] as String;
+  )
+    ..id = json['article_id'] as String
+    ..originUrl = json['origin_url'] as String;
 }
 
 Map<String, dynamic> _$NewsToJson(News instance) => <String, dynamic>{
+      'article_id': instance.id,
       'title': instance.title,
       'body_html': instance.content,
       'provider': instance.provider,

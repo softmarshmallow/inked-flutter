@@ -1,44 +1,62 @@
-
+import 'package:dio/dio.dart';
 import 'package:eventsource/eventsource.dart';
+import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/remote/news_api.dart';
 import 'package:web_socket_channel/html.dart';
 import 'package:http/browser_client.dart' as http;
 
-class RealtimeNewsReceiver{
-
+class RealtimeNewsReceiver {
   // region
-  static final RealtimeNewsReceiver _singleton = RealtimeNewsReceiver._internal();
+  static final RealtimeNewsReceiver _singleton =
+      RealtimeNewsReceiver._internal();
+
   factory RealtimeNewsReceiver() {
     return _singleton;
   }
+
   RealtimeNewsReceiver._internal();
+
   // endregion
 
   final channel = HtmlWebSocketChannel.connect('ws://$server/ws/news/');
-  Future<EventSource> eventSource = EventSource.connect("http://$server/api/events/",client: http.BrowserClient());
+  Future<EventSource> eventSource = EventSource.connect(
+      "http://$server/api/events/",
+      client: http.BrowserClient());
 
-//  final sseChannel =
-//  a() async {
-//    var a  = await eventSource;
-//  }
-
-  close(){
-    channel.sink.close();
+  static const _interval = 500; // ms
+  static const _amount = 20; // que per request
+  Stream<News> newsStream() async* {
+    String lastNewsId;
+    List<News> newRecents = [];
+    var api = NewsApi(Dio());
+    while (true) {
+      await new Future.delayed(new Duration(milliseconds: _interval));
+      var recents = await api.getLastNews(count: _amount);
+      if (lastNewsId == null) {
+        newRecents = recents;
+      } else{
+        newRecents = filterRecentById(recents, lastNewsId);
+      }
+      print("newRecents ${newRecents.length}");
+      if (newRecents.length > 0) {
+        lastNewsId = newRecents.first.id;
+        for (var d in newRecents){
+          yield d;
+        }
+      }
+    }
   }
-//
-//  _builder(){
-//    channel.stream.listen((data){
-//      print(data);
-//    }).onError((e){
-//
-//    });
-//
-//
-//    StreamBuilder(
-//      stream: channel.stream,
-//      builder: (context, snapshot) {
-//        return Text(snapshot.hasData ? '${snapshot.data}' : '');
-//      },
-//    );
-//  }
+
+  List<News> filterRecentById(List<News> recents, String id){
+    List<News> result = [];
+    for(var r in recents){
+      if (r.id == id) {
+        break;
+      }  else{
+        result.add(r);
+      }
+    }
+    return result;
+  }
 }

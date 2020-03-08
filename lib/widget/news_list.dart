@@ -36,30 +36,25 @@ class _LiveNewsListView extends State<LiveNewsListView> {
     }).catchError((e){
       print(e);
     });
-    RealtimeNewsReceiver().channel.stream.listen((event) {
-      var parsedJson = json.decode(event);
-      var newsItem = News.fromJson(parsedJson['news']);
-      setState(() {
-        news.add(newsItem);
-        if (news.length > LIST_MAX) {
-          news.removeRange(0, news.length - LIST_MAX);
-        }
-      });
-    });
 
-    // event stream test
-    RealtimeNewsReceiver().eventSource.then((value) => (stream){
-      stream.listen((event) {
-        print(event);
-        var parsedJson = json.decode(event);
-        var newsItem = News.fromJson(parsedJson['news']);
-        setState(() {
-          news.add(newsItem);
-          if (news.length > LIST_MAX) {
-            news.removeRange(0, news.length - LIST_MAX);
-          }
-        });
-      });
+//    RealtimeNewsReceiver().channel.stream.listen((event) {
+//      var parsedJson = json.decode(event);
+//      var newsItem = News.fromJson(parsedJson['news']);
+//      addNews(newsItem);
+//    });
+//
+
+    RealtimeNewsReceiver().newsStream().listen((event) {
+      addNews(event);
+    });
+  }
+
+  void addNews(News newsItem){
+    setState(() {
+      news.add(newsItem);
+      if (news.length > LIST_MAX) {
+        news.removeRange(0, news.length - LIST_MAX);
+      }
     });
   }
 
@@ -78,7 +73,7 @@ class NewsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-        child: ScrollablePositionedList.builder(
+        child: news.isEmpty ? Text("loading..") : ScrollablePositionedList.builder(
       itemScrollController: _scrollController,
       itemCount: news.length,
       itemBuilder: (context, index) {
