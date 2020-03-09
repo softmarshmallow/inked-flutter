@@ -24,24 +24,23 @@ class RealtimeNewsReceiver {
       "http://$server/api/events/",
       client: http.BrowserClient());
 
-  static const _interval = 500; // ms
-  static const _amount = 20; // que per request
+  static const _interval = 2000; // ms
   Stream<News> newsStream() async* {
     String lastNewsId;
     List<News> newRecents = [];
     var api = NewsApi(Dio());
     while (true) {
       await new Future.delayed(new Duration(milliseconds: _interval));
-      var recents = await api.getLastNews(count: _amount);
+      var recents = await api.getLastNews();
       if (lastNewsId == null) {
         newRecents = recents;
       } else{
         newRecents = filterRecentById(recents, lastNewsId);
       }
-      print("newRecents ${newRecents.length}");
       if (newRecents.length > 0) {
+        print("newRecents ${newRecents.length}");
         lastNewsId = newRecents.first.id;
-        for (var d in newRecents){
+        for (var d in newRecents.reversed){
           yield d;
         }
       }

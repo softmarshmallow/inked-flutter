@@ -24,18 +24,9 @@ const LIST_MAX = 1000;
 
 class _LiveNewsListView extends State<LiveNewsListView> {
   final Dio dio = Dio();
-  NewsApi _api;
   List<News> news = [];
 
   _LiveNewsListView() {
-    _api = NewsApi(dio);
-    _api.getLastNews().then((value) {
-      setState(() {
-        news = value;
-      });
-    }).catchError((e){
-      print(e);
-    });
 
 //    RealtimeNewsReceiver().channel.stream.listen((event) {
 //      var parsedJson = json.decode(event);
@@ -45,13 +36,14 @@ class _LiveNewsListView extends State<LiveNewsListView> {
 //
 
     RealtimeNewsReceiver().newsStream().listen((event) {
+      print("recieved news from stram ${event.title}");
       addNews(event);
     });
   }
 
   void addNews(News newsItem){
     setState(() {
-      news.add(newsItem);
+      news.insert(0, newsItem);
       if (news.length > LIST_MAX) {
         news.removeRange(0, news.length - LIST_MAX);
       }
