@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:inked/data/model/news.dart';
@@ -24,13 +26,12 @@ class RealtimeNewsReceiver {
       "http://$server/api/events/",
       client: http.BrowserClient());
 
-  static const _interval = 2000; // ms
+  static const _interval = Duration(seconds: 5, milliseconds: 0);
   Stream<News> newsStream() async* {
     String lastNewsId;
     List<News> newRecents = [];
     var api = NewsApi(Dio());
     while (true) {
-      await new Future.delayed(new Duration(milliseconds: _interval));
       var recents = await api.getLastNews();
       if (lastNewsId == null) {
         newRecents = recents;
@@ -44,6 +45,8 @@ class RealtimeNewsReceiver {
           yield d;
         }
       }
+//      sleep(_interval);
+      await new Future.delayed(_interval);
     }
   }
 

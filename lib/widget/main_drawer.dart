@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/screen/filter_settings_screen.dart';
+import 'package:inked/screen/saved_news_screen.dart';
+import 'package:inked/screen/spam_or_not_screen.dart';
 
 Widget buildMainDrawer(BuildContext context) {
   return Drawer(
@@ -26,15 +28,14 @@ Widget buildMainDrawer(BuildContext context) {
           leading: Icon(Icons.inbox),
           title: Text('saved'),
           onTap: () {
-            // Update the state of the app.
-            // ...
+            Navigator.of(context).pushNamed(SavedNewsScreen.routeName);
           },
         ),
         ListTile(
-          title: Text('Train data'),
+          leading: Icon(Icons.done_all),
+          title: Text('spam or not'),
           onTap: () {
-            // Update the state of the app.
-            // ...
+            Navigator.of(context).pushNamed(SpamOrNotScreen.routeName);
           },
         ),
 

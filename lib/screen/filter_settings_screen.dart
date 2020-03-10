@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/dialogs/edit_token_filter_dialog.dart';
+import 'package:inked/screen/filter_create_screen.dart';
 
 class FilterSettingsScreen extends StatefulWidget {
   static const String routeName = "/settings/filter/basics";
@@ -108,8 +109,6 @@ class _FilterSettingsScreen extends State<FilterSettingsScreen> {
   }
 
   _showCreateTokenFilterDialog() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => EditTokenFilterDialog());
+    Navigator.of(context).pushNamed(FilterCreateScreen.routeName);
   }
 }
