@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/data/remote/realtime_news_receiver.dart';
 import 'package:inked/screen/content_detail_screen.dart';
@@ -84,9 +85,9 @@ class NewsListView extends StatelessWidget {
 class NewsListItem extends StatelessWidget {
   final News data;
   final bool isFocused;
-
+  var api = NewsApi(RemoteApiManager().getDio());
   NewsListItem(this.data, {this.isFocused = false});
-
+  var markedSpam = false;
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -116,10 +117,25 @@ class NewsListItem extends StatelessWidget {
               ),
               _buildContentSection(context),
               Spacer(),
-              Text(
-                "content snippet",
-                style: Theme.of(context).textTheme.subtitle1,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text(
+                    "content snippet",
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      IconButton(icon: Icon(Icons.report), color: !markedSpam ? Colors.black: Colors.red, onPressed: (){
+                        // mark as spam
+                        markedSpam = true;
+                        api.markSpamNews(SpamMarkRequest(id: data.id, is_spam: true));
+                      },)
+                    ],
+                  )
+                ],
               ),
+
             ],
           ),
         ));

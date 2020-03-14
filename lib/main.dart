@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/utils/routes.dart';
@@ -11,6 +12,7 @@ import 'package:inked/widget/position_news_content_holder.dart';
 import 'package:firebase/firebase.dart';
 
 void main() {
+  DotEnv().load('.env');
   runApp(App());
 }
 
