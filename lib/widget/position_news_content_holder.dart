@@ -3,9 +3,9 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
-import 'package:inked/data/model/news.dart';
-import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/widget/content_detail.dart';
 
 class PositionedNewsContentHolder extends StatefulWidget {
@@ -16,24 +16,34 @@ class PositionedNewsContentHolder extends StatefulWidget {
 class _PositionedNewsContentHolder extends State<PositionedNewsContentHolder> {
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: FractionalOffset.bottomCenter,
-      child: Container(
-        height: _desiredHeight(),
-        decoration: BoxDecoration(
-          color: Theme.of(context).canvasColor,
-        ),
-        child: Stack(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: ContentDetailView(MockNewsDatabase.allNewsDataList[0]),
-            ),
-            _buildKnob(),
-          ],
-        ),
-      ),
-    );
+    return BlocBuilder<NewsListBloc, ListViewState>(
+          builder: (context, state) {
+            var content;
+            if (state is EmptyFocusState) {
+              content = Text("no selected content");
+            }else{
+              var news = state.news;
+              content = ContentDetailView(news);
+            }
+            return Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: Container(
+                height: _desiredHeight(),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).canvasColor,
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: content,
+                    ),
+                    _buildKnob(),
+                  ],
+                ),
+              ),
+            );
+          });
   }
 
   static const double minHeight = 80.0;

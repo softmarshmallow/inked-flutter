@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/utils/routes.dart';
@@ -12,8 +14,12 @@ import 'package:inked/widget/position_news_content_holder.dart';
 import 'package:firebase/firebase.dart';
 
 void main() {
-  DotEnv().load('.env');
+  loadEnv();
   runApp(App());
+}
+
+Future<void> loadEnv() async {
+  await DotEnv().load('.env');
 }
 
 Future<void> initFirebaseWeb(BuildContext context) async {
@@ -41,7 +47,10 @@ class App extends StatelessWidget {
         primarySwatch: Colors.yellow,
       ),
       routes: buildRoutes(context),
-      home: HomeScreen(title: 'Inked'),
+      home: BlocProvider(
+        create: (context) => NewsListBloc(),
+        child: HomeScreen(title: 'Inked'),
+      ),
     );
   }
 }
@@ -69,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(
           children: <Widget>[
             LiveNewsListView(),
-//            PositionedNewsContentHolder()
+            PositionedNewsContentHolder()
           ],
         ));
   }

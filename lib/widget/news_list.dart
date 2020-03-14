@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
@@ -28,7 +30,6 @@ class _LiveNewsListView extends State<LiveNewsListView> {
   List<News> news = [];
 
   _LiveNewsListView() {
-
 //    RealtimeNewsReceiver().channel.stream.listen((event) {
 //      var parsedJson = json.decode(event);
 //      var newsItem = News.fromJson(parsedJson['news']);
@@ -42,7 +43,7 @@ class _LiveNewsListView extends State<LiveNewsListView> {
     });
   }
 
-  void addNews(News newsItem){
+  void addNews(News newsItem) {
     setState(() {
       news.insert(0, newsItem);
       if (news.length > LIST_MAX) {
@@ -65,18 +66,26 @@ class NewsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-        child: news.isEmpty ? Text("loading..") : ScrollablePositionedList.builder(
-      itemScrollController: _scrollController,
-      itemCount: news.length,
-      itemBuilder: (context, index) {
-        var isFocused = index == 3;
-        return NewsListItem(news[index], isFocused: isFocused);
-      },
-    ));
+    var bloc = BlocProvider.of<NewsListBloc>(context);
+    return BlocBuilder<NewsListBloc, ListViewState>(builder: (context, state) {
+      return Scrollbar(
+          child: news.isEmpty
+              ? Text("loading..")
+              : ScrollablePositionedList.builder(
+                  itemScrollController: _scrollController,
+                  itemCount: news.length,
+                  itemBuilder: (context, index) {
+                    var data = news[index];
+                    var isFocused = bloc.state.news != null
+                        ? data.id == bloc.state.news.id
+                        : false;
+                    return NewsListItem(data, isFocused: isFocused);
+                  },
+                ));
+    });
   }
 
-  _scrollToFocused(){
+  _scrollToFocused() {
     _scrollController.jumpTo(index: 12);
   }
 }
@@ -86,13 +95,16 @@ class NewsListItem extends StatelessWidget {
   final News data;
   final bool isFocused;
   var api = NewsApi(RemoteApiManager().getDio());
+
   NewsListItem(this.data, {this.isFocused = false});
+
   var markedSpam = false;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          _onTap();
+          _onTap(context);
         },
         onDoubleTap: () {
           _onDoubleTap(context);
@@ -126,16 +138,20 @@ class NewsListItem extends StatelessWidget {
                   ),
                   Row(
                     children: <Widget>[
-                      IconButton(icon: Icon(Icons.report), color: !markedSpam ? Colors.black: Colors.red, onPressed: (){
-                        // mark as spam
-                        markedSpam = true;
-                        api.markSpamNews(SpamMarkRequest(id: data.id, is_spam: true));
-                      },)
+                      IconButton(
+                        icon: Icon(Icons.report),
+                        color: !markedSpam ? Colors.black : Colors.red,
+                        onPressed: () {
+                          // mark as spam
+                          markedSpam = true;
+                          api.markSpamNews(
+                              SpamMarkRequest(id: data.id, is_spam: true));
+                        },
+                      )
                     ],
                   )
                 ],
               ),
-
             ],
           ),
         ));
@@ -179,7 +195,11 @@ class NewsListItem extends StatelessWidget {
     }
   }
 
-  void _onTap() {}
+  void _onTap(BuildContext context) {
+    var bloc = BlocProvider.of<NewsListBloc>(context);
+    bloc.add(NewsFocusEvent(data));
+//    bloc.close();
+  }
 
   void _onDoubleTap(BuildContext context) {
     Navigator.of(context)
