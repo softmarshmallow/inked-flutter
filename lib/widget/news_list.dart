@@ -38,7 +38,6 @@ class _LiveNewsListView extends State<LiveNewsListView> {
 //
 
     RealtimeNewsReceiver().newsStream().listen((event) {
-      print("recieved news from stram ${event.title}");
       addNews(event);
     });
   }

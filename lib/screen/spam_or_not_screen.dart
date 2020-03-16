@@ -1,7 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
@@ -27,6 +25,7 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
   final _scaffoldState = GlobalKey<ScaffoldState>();
   News news;
   var api = NewsApi(RemoteApiManager().getDio());
+  var spamLabelledCountMap = {"spam": 0, "normal":0};
 
   @override
   void initState() {
@@ -73,6 +72,10 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
                     label: Text("spam ($isSpamShortcut)")),
               ],
             ),
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Text("spam: ${spamLabelledCountMap['spam']}\nnormal: ${spamLabelledCountMap['normal']}", style: Theme.of(context).textTheme.caption,),
+            )
           ],
         ),
         onKey: (key) {
@@ -117,13 +120,15 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
   }
 
   _onIsSpamPressed() async {
-    _showSnackbar("marked as spam");
+    _showSnackbar("marked as spam", Colors.deepOrange);
+    spamLabelledCountMap['spam'] += 1;
     await _provideDocumentFeedback(true);
     _loadNewDocument();
   }
 
   _onIsNotSpamPressed() async {
-    _showSnackbar("marked as non spam");
+    _showSnackbar("marked as non spam", Colors.blueAccent);
+    spamLabelledCountMap['normal'] += 1;
     await _provideDocumentFeedback(false);
     _loadNewDocument();
   }
@@ -132,9 +137,10 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
     await api.markSpamNews(new SpamMarkRequest(id: news.id, is_spam: isSpam));
   }
 
-  _showSnackbar(String message) {
+  _showSnackbar(String message, Color color) {
     _scaffoldState.currentState.showSnackBar(SnackBar(
       content: Text(message),
+      backgroundColor: color,
       duration: Duration(milliseconds: 200),
     ));
   }

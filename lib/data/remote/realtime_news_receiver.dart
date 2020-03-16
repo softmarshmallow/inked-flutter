@@ -39,7 +39,6 @@ class RealtimeNewsReceiver {
         newRecents = filterRecentById(recents, lastNewsId);
       }
       if (newRecents.length > 0) {
-        print("newRecents ${newRecents.length}");
         lastNewsId = newRecents.first.id;
         for (var d in newRecents.reversed){
           yield d;
