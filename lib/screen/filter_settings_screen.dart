@@ -13,21 +13,21 @@ class FilterSettingsScreen extends StatefulWidget {
 
 class _FilterSettingsScreen extends State<FilterSettingsScreen> {
   bool sort;
-  List<TokenFilter> filters;
+  List<SingleTokenFilterLayer> filters;
 
   @override
   void initState() {
     sort = false;
     filters = [
-      TokenFilter(
+      SingleTokenFilterLayer(
         token: "예) [포토]",
         scope: FilterScope.Title,
-        type: FilterType.Ignore,
+//        type: FilterType.Ignore,
       ),
-      TokenFilter(
+      SingleTokenFilterLayer(
         token: "예) [연예]",
         scope: FilterScope.Title,
-        type: FilterType.Ignore,
+//        type: FilterType.Ignore,
       ),
     ];
     super.initState();
@@ -53,10 +53,10 @@ class _FilterSettingsScreen extends State<FilterSettingsScreen> {
 
   Widget _buildFilterDataTable() {
 
-    DataRow _buildRow(TokenFilter filter) {
+    DataRow _buildRow(SingleTokenFilterLayer filter) {
       return DataRow(cells: [
         DataCell(Text(filter.token)),
-        DataCell(Text(filter.type.toString())),
+//        DataCell(Text(filter.type.toString())),
         DataCell(Text(filter.scope.toString())),
         DataCell(Row(
           children: <Widget>[

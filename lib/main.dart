@@ -1,20 +1,17 @@
-import 'dart:convert';
-
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/blocs/newslist/bloc.dart';
-import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/utils/routes.dart';
-import 'package:inked/widget/content_detail.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
-import 'package:firebase/firebase.dart';
 
-void main() {
+void main(){
   loadEnv();
+//  initFirebaseWeb();
   runApp(App());
 }
 
@@ -22,24 +19,32 @@ Future<void> loadEnv() async {
   await DotEnv().load('.env');
 }
 
-Future<void> initFirebaseWeb(BuildContext context) async {
-  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
-  final jsonResult = json.decode(data);
-  if (apps.isEmpty) {
+initFirebaseWeb() {
+//  initializeApp(
+//      apiKey: "AIzaSyBKTFm__PODFS5Yr3qrkWGLixXlnfyb6uo",
+//      authDomain: "inked-frontent.firebaseapp.com",
+//      databaseURL: "https://inked-frontent.firebaseio.com",
+//      projectId: "inked-frontent",
+//      storageBucket: "inked-frontent.appspot.com");
+
+//  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
+//  final jsonResult = json.decode(data);
+  var env = DotEnv().env;
+  print(env["apiKey"]);
+//  if (apps.isEmpty) {
     initializeApp(
-      apiKey: jsonResult['apiKey'],
-      authDomain: jsonResult['authDomain'],
-      databaseURL: jsonResult['databaseURL'],
-      projectId: jsonResult['projectId'],
-      storageBucket: jsonResult['storageBucket'],);
-  }
+      apiKey: env['apiKey'],
+      authDomain: env['authDomain'],
+      databaseURL: env['databaseURL'],
+      projectId: env['projectId'],
+      storageBucket: env['storageBucket'],);
+//  }
 }
 
 class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    initFirebaseWeb(context);
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,

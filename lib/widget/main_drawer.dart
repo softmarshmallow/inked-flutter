@@ -1,5 +1,5 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/filter_settings_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
@@ -38,16 +38,13 @@ Widget buildMainDrawer(BuildContext context) {
             Navigator.of(context).pushNamed(SpamOrNotScreen.routeName);
           },
         ),
-
         ListTile(
-          title: Text('dev - sound'),
-          onTap:  () async {
-            AudioPlayer audioPlayer = AudioPlayer();
-            var res = await audioPlayer.play("https://freesound.org/data/previews/147/147597_2173181-lq.mp3");
-            var eres = await audioPlayer.play("beep.mp3", isLocal: true);
+          leading: Icon(Icons.developer_mode),
+          title: Text('development'),
+          onTap: () {
+            Navigator.of(context).pushNamed(DevelopmentLandingScreen.routeName);
           },
         ),
-
       ],
     ),
   );
