@@ -7,10 +7,13 @@ part of 'filter.dart';
 // **************************************************************************
 
 TokenFilter _$TokenFilterFromJson(Map<String, dynamic> json) {
-  return TokenFilter()
-    ..id = json['id'] as int
-    ..name = json['name'] as String
-    ..type = _$enumDecodeNullable(_$FilterTypeEnumMap, json['type'])
+  return TokenFilter(
+    json['name'] as String,
+    action: _$enumDecodeNullable(_$FilterActionEnumMap, json['action']),
+    operation: _$enumDecodeNullable(_$OperationTypeEnumMap, json['operation']),
+    isRootFilter: json['isRootFilter'] as bool,
+    isOn: json['isOn'] as bool,
+  )
     ..filterLayers = (json['filterLayers'] as List)
         ?.map((e) => e == null
             ? null
@@ -19,19 +22,18 @@ TokenFilter _$TokenFilterFromJson(Map<String, dynamic> json) {
     ..extraFilters = (json['extraFilters'] as List)
         ?.map((e) =>
             e == null ? null : TokenFilter.fromJson(e as Map<String, dynamic>))
-        ?.toList()
-    ..operation =
-        _$enumDecodeNullable(_$OperationTypeEnumMap, json['operation']);
+        ?.toList();
 }
 
 Map<String, dynamic> _$TokenFilterToJson(TokenFilter instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'name': instance.name,
-      'type': _$FilterTypeEnumMap[instance.type],
+      'action': _$FilterActionEnumMap[instance.action],
       'filterLayers': instance.filterLayers,
       'extraFilters': instance.extraFilters,
       'operation': _$OperationTypeEnumMap[instance.operation],
+      'isRootFilter': instance.isRootFilter,
+      'isOn': instance.isOn,
     };
 
 T _$enumDecode<T>(
@@ -66,9 +68,9 @@ T _$enumDecodeNullable<T>(
   return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
 }
 
-const _$FilterTypeEnumMap = {
-  FilterType.Ignore: 'Ignore',
-  FilterType.Notify: 'Notify',
+const _$FilterActionEnumMap = {
+  FilterAction.Hide: 'Ignore',
+  FilterAction.Notify: 'Notify',
 };
 
 const _$OperationTypeEnumMap = {
@@ -81,21 +83,23 @@ SingleTokenFilterLayer _$SingleTokenFilterLayerFromJson(
   return SingleTokenFilterLayer(
     token: json['token'] as String,
     scope: _$enumDecodeNullable(_$FilterScopeEnumMap, json['scope']),
-  )
-    ..id = json['id'] as int
-    ..name = json['name'] as String;
+  )..match = _$enumDecodeNullable(_$MatchTypeEnumMap, json['match']);
 }
 
 Map<String, dynamic> _$SingleTokenFilterLayerToJson(
         SingleTokenFilterLayer instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
       'token': instance.token,
       'scope': _$FilterScopeEnumMap[instance.scope],
+      'match': _$MatchTypeEnumMap[instance.match],
     };
 
 const _$FilterScopeEnumMap = {
   FilterScope.Title: 'Title',
   FilterScope.Body: 'Body',
+};
+
+const _$MatchTypeEnumMap = {
+  MatchType.Contains: 'Contains',
+  MatchType.Matches: 'Matches',
 };

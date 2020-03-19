@@ -7,10 +7,12 @@ part 'filter.g.dart';
 
 @JsonSerializable()
 class TokenFilter{
-  TokenFilter();
-  int id = DateTime.now().millisecondsSinceEpoch;
-  String name;
-  FilterType type = FilterType.Notify;
+  TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn});
+
+  @JsonKey(ignore: true)
+  String id = DateTime.now().toIso8601String();
+  String name = "untitled";
+  FilterAction action = FilterAction.Notify;
   List<SingleTokenFilterLayer> filterLayers = [];
   List<TokenFilter> extraFilters = [];
   OperationType operation = OperationType.And;
@@ -24,13 +26,18 @@ class TokenFilter{
 @JsonSerializable()
 class SingleTokenFilterLayer {
   SingleTokenFilterLayer({@required this.token, @required this.scope});
-  int id = DateTime.now().millisecondsSinceEpoch;
-  String name;
+
+  @JsonKey(ignore: true)
+  String id = DateTime.now().toIso8601String();
   String token;
-  FilterScope scope;
+  FilterScope scope = FilterScope.Title;
+  MatchType match = MatchType.Matches;
 
   factory SingleTokenFilterLayer.fromJson(Map<String, dynamic> json) => _$SingleTokenFilterLayerFromJson(json);
   Map<String, dynamic> toJson() => _$SingleTokenFilterLayerToJson(this);
+
+  @override
+  String toString() => "$token in $scope as $match";
 }
 
 
@@ -45,8 +52,8 @@ enum MatchType{
 }
 
 
-enum FilterType{
-  Ignore,
+enum FilterAction{
+  Hide,
   Notify
 }
 

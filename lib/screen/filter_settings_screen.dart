@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/data/model/filter.dart';
-import 'package:inked/dialogs/edit_token_filter_dialog.dart';
 import 'package:inked/screen/filter_create_screen.dart';
 
 class FilterSettingsScreen extends StatefulWidget {
@@ -41,7 +40,7 @@ class _FilterSettingsScreen extends State<FilterSettingsScreen> {
       ),
       body: Container(
         padding: EdgeInsets.all(12),
-        child: _buildFilterDataTable(),
+//        child: _buildFilterDataTable(),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
