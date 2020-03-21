@@ -100,6 +100,6 @@ const _$FilterScopeEnumMap = {
 };
 
 const _$MatchTypeEnumMap = {
-  MatchType.Contains: 'Contains',
-  MatchType.Matches: 'Matches',
+  FilterMatchType.Contains: 'Contains',
+  FilterMatchType.Matches: 'Matches',
 };

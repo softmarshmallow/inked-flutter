@@ -9,8 +9,8 @@ class EditTokenFilterLayerDialog extends StatefulWidget {
 
 class _EditTokenFilterLayerDialogState
     extends State<EditTokenFilterLayerDialog> {
-  SingleTokenFilterLayer layer =
-      new SingleTokenFilterLayer(token: null, scope: FilterScope.Title);
+  SingleTokenFilterLayer layer = new SingleTokenFilterLayer(
+      token: null, scope: FilterScope.Title, match: FilterMatchType.Matches);
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -21,6 +21,7 @@ class _EditTokenFilterLayerDialogState
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               TextFormField(
                 validator: (value) {
@@ -37,35 +38,21 @@ class _EditTokenFilterLayerDialogState
                   });
                 },
               ),
-              Section("filter type",
-                  child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: const Text('exactly matches'),
-                        leading: Radio(
-                          value: MatchType.Matches,
-                          groupValue: layer.match,
-                          onChanged: (value) {
-                            setState(() {
-                              layer.match = value;
-                            });
-                          },
-                        ),
-                      ),
-                      ListTile(
-                        title: const Text('contains'),
-                        leading: Radio(
-                          value: MatchType.Contains,
-                          groupValue: layer.match,
-                          onChanged: (value) {
-                            setState(() {
-                              layer.match = value;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  )),
+              Section(
+                "filter type",
+                child: DropdownButton(
+                  value: layer.match,
+                  onChanged: (FilterMatchType value) {
+                    setState(() {
+                      layer.match = value;
+                    });
+                  },
+                  items: FilterMatchType.values.map((FilterMatchType match) {
+                    return DropdownMenuItem<FilterMatchType>(
+                        value: match, child: Text(match.toString()));
+                  }).toList(),
+                ),
+              ),
               Section(
                 "scope",
                 child: Column(
@@ -98,7 +85,9 @@ class _EditTokenFilterLayerDialogState
                 ),
               ),
               Text(
-                  "token \"${layer.token}\" should ${layer.match} in ${layer.scope}", style: Theme.of(context).textTheme.caption,)
+                "token \"${layer.token}\" should ${layer.match} in ${layer.scope}",
+                style: Theme.of(context).textTheme.caption,
+              )
             ],
           )),
       actions: <Widget>[

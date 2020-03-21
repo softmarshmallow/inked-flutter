@@ -25,13 +25,13 @@ class TokenFilter{
 
 @JsonSerializable()
 class SingleTokenFilterLayer {
-  SingleTokenFilterLayer({@required this.token, @required this.scope});
+  SingleTokenFilterLayer({@required this.token, @required this.scope, this.match});
 
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
   String token;
   FilterScope scope = FilterScope.Title;
-  MatchType match = MatchType.Matches;
+  FilterMatchType match = FilterMatchType.Matches;
 
   factory SingleTokenFilterLayer.fromJson(Map<String, dynamic> json) => _$SingleTokenFilterLayerFromJson(json);
   Map<String, dynamic> toJson() => _$SingleTokenFilterLayerToJson(this);
@@ -46,9 +46,11 @@ enum OperationType{
   Or
 }
 
-enum MatchType{
+enum FilterMatchType{
   Contains,
-  Matches
+  Matches,
+  NotContains,
+  MotMatches,
 }
 
 
