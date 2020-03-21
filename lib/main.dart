@@ -20,24 +20,18 @@ Future<void> loadEnv() async {
 }
 
 initFirebaseWeb() {
-//  initializeApp(
-//      apiKey: "AIzaSyBKTFm__PODFS5Yr3qrkWGLixXlnfyb6uo",
-//      authDomain: "inked-frontent.firebaseapp.com",
-//      databaseURL: "https://inked-frontent.firebaseio.com",
-//      projectId: "inked-frontent",
-//      storageBucket: "inked-frontent.appspot.com");
-
+  // FIXME does not work via dart, works in html script -> https://github.com/FirebaseExtended/flutterfire/issues/2204
 //  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
 //  final jsonResult = json.decode(data);
-  var env = DotEnv().env;
-  print(env["apiKey"]);
+//  var env = DotEnv().env;
+//  print(env["apiKey"]);
 //  if (apps.isEmpty) {
-    initializeApp(
-      apiKey: env['apiKey'],
-      authDomain: env['authDomain'],
-      databaseURL: env['databaseURL'],
-      projectId: env['projectId'],
-      storageBucket: env['storageBucket'],);
+//    initializeApp(
+//      apiKey: env['apiKey'],
+//      authDomain: env['authDomain'],
+//      databaseURL: env['databaseURL'],
+//      projectId: env['projectId'],
+//      storageBucket: env['storageBucket'],);
 //  }
 }
 

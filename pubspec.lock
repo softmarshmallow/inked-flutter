@@ -219,14 +219,14 @@ packages:
     source: hosted
     version: "0.2.2"
   firebase:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: firebase
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.2.1"
   firebase_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"

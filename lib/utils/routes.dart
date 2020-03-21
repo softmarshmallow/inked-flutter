@@ -4,6 +4,7 @@ import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/filter_create_screen.dart';
 import 'package:inked/screen/filter_settings_screen.dart';
+import 'package:inked/screen/filter_testing_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
 
@@ -13,6 +14,7 @@ Map<String, WidgetBuilder> buildRoutes(BuildContext context){
     SavedNewsScreen.routeName: (context) => SavedNewsScreen(),
     FilterSettingsScreen.routeName: (context) => FilterSettingsScreen(),
     FilterCreateScreen.routeName: (context) => FilterCreateScreen(),
+    FilterTestingScreen.routeName: (context) => FilterTestingScreen(),
     SpamOrNotScreen.routeName: (context) => SpamOrNotScreen(),
 
     // region development
