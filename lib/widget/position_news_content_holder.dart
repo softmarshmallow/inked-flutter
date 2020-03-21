@@ -16,10 +16,10 @@ class PositionedNewsContentHolder extends StatefulWidget {
 class _PositionedNewsContentHolder extends State<PositionedNewsContentHolder> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NewsListBloc, ListViewState>(
+    return BlocBuilder<NewsListBloc, NewsListState>(
           builder: (context, state) {
             var content;
-            if (state is EmptyFocusState) {
+            if (state is NoFocusState) {
               content = Text("no selected content");
             }else{
               var news = state.news;

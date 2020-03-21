@@ -7,7 +7,7 @@ import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
-import 'package:inked/data/remote/realtime_news_receiver.dart';
+import 'package:inked/data/repository/news_repository.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
@@ -20,18 +20,13 @@ class LiveNewsListView extends StatefulWidget {
   State<StatefulWidget> createState() => _LiveNewsListView();
 }
 
-const LIST_MAX = 1000;
+
+
 
 class _LiveNewsListView extends State<LiveNewsListView> {
   final Dio dio = Dio();
-  List<News> news = [];
+//  List<News> news = [];
   NewsListBloc bloc;
-
-  _LiveNewsListView() {
-    RealtimeNewsReceiver().newsStream().listen((event) {
-      addNews(event);
-    });
-  }
 
   onItemTap(News news) {
     bloc.add(NewsFocusEvent(news));
@@ -75,15 +70,6 @@ class _LiveNewsListView extends State<LiveNewsListView> {
             ));
   }
 
-  void addNews(News newsItem) {
-    setState(() {
-      news.insert(0, newsItem);
-      if (news.length > LIST_MAX) {
-        news.removeRange(0, news.length - LIST_MAX);
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -98,8 +84,9 @@ class _LiveNewsListView extends State<LiveNewsListView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NewsListBloc, ListViewState>(builder: (context, state) {
-      return NewsListView(news,
+    return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
+      print('new state received >> ${state.runtimeType}');
+      return NewsListView(NewsRepository.NEWS_LIST,
           defaultItemAction: NewsListItemActions(onItemTap,
               onDoubleTap: onItemDoubleTap, onLongPress: onItemLongPress),
         focusedNews: state.news,

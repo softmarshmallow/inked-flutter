@@ -9,7 +9,7 @@ import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
 
-void main(){
+void main() {
   loadEnv();
 //  initFirebaseWeb();
   runApp(App());
@@ -64,9 +64,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  NewsListBloc bloc;
+
+  initState() {
+    super.initState();
+    bloc = BlocProvider.of<NewsListBloc>(context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bloc.close();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
+      return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
           actions: <Widget>[
@@ -75,11 +89,22 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: buildMainDrawer(context),
         body: Stack(
-          children: <Widget>[
-            LiveNewsListView(),
-            PositionedNewsContentHolder()
-          ],
-        ));
+          children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
+        ),
+        floatingActionButton: _buildFab(context, state),
+      );
+    });
+  }
+
+  Widget _buildFab(BuildContext context, NewsListState state) {
+    if (state is! TopFocusState) {
+      return FloatingActionButton(
+          child: Icon(Icons.arrow_upward),
+          onPressed: () {
+            bloc.add(TopFocusEvent());
+          });
+    }
+    return SizedBox.shrink();
   }
 
   _onSearchPressed() {
