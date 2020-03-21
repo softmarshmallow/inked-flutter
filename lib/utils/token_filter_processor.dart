@@ -43,7 +43,6 @@ class TokenFilterProcessor implements IFilterProcessor{
         // one of filter results && layer results should be true
         break;
     }
-
   }
 }
 
@@ -67,11 +66,17 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
     bool matched = false;
     tokenizer.tokens.forEach((token) {
       switch(layer.match){
-        case MatchType.Contains:
+        case FilterMatchType.Contains:
           matched = token.contains(content);
           break;
-        case MatchType.Matches:
+        case FilterMatchType.Matches:
           matched = token == content;
+          break;
+        case FilterMatchType.NotContains:
+          // TODO: Handle this case.
+          break;
+        case FilterMatchType.MotMatches:
+          // TODO: Handle this case.
           break;
       }
     });
