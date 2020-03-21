@@ -4,6 +4,7 @@ import 'package:inked/utils/tokenizer.dart';
 
 abstract class IFilterProcessor{
   bool process();
+  List<bool> results = [];
 }
 
 
@@ -14,7 +15,6 @@ class TokenFilterProcessor implements IFilterProcessor{
 
   @override
   bool process(){
-
     List<bool> layerResults = [];
     filter.filterLayers.forEach((layer) {
       var result = SingleTokenFilterLayerProcessor(news, layer).process();
@@ -32,18 +32,20 @@ class TokenFilterProcessor implements IFilterProcessor{
       });
     }
 
-    // TODO check by operation
+    results..addAll(layerResults)..addAll(filterResults);
+
     switch(filter.operation){
       case OperationType.And:
-        // TODO: Handle this case.
         // filter results && layer results should all be true
         break;
       case OperationType.Or:
-        // TODO: Handle this case.
         // one of filter results && layer results should be true
         break;
     }
   }
+
+  @override
+  List<bool> results = [];
 }
 
 class SingleTokenFilterLayerProcessor implements IFilterProcessor{
@@ -75,7 +77,7 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
         case FilterMatchType.NotContains:
           // TODO: Handle this case.
           break;
-        case FilterMatchType.MotMatches:
+        case FilterMatchType.NotMatches:
           // TODO: Handle this case.
           break;
       }
@@ -94,4 +96,7 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
     }
     return null;
   }
+
+  @override
+  List<bool> results = [];
 }

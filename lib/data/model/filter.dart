@@ -7,7 +7,7 @@ part 'filter.g.dart';
 
 @JsonSerializable()
 class TokenFilter{
-  TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn});
+  TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn, this.filterLayers=const []});
 
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
@@ -50,7 +50,7 @@ enum FilterMatchType{
   Contains,
   Matches,
   NotContains,
-  MotMatches,
+  NotMatches,
 }
 
 

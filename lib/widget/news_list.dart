@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,13 +27,6 @@ class _LiveNewsListView extends State<LiveNewsListView> {
   List<News> news = [];
 
   _LiveNewsListView() {
-//    RealtimeNewsReceiver().channel.stream.listen((event) {
-//      var parsedJson = json.decode(event);
-//      var newsItem = News.fromJson(parsedJson['news']);
-//      addNews(newsItem);
-//    });
-//
-
     RealtimeNewsReceiver().newsStream().listen((event) {
       addNews(event);
     });

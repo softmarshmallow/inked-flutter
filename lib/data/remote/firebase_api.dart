@@ -1,7 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inked/data/model/filter.dart';
 
-abstract class BaseFirestoreApi<T> {
+abstract class IRepository<T>{
+  Future<T> get (String id);
+  Future<T> create(T record);
+  Future<List<T>> list();
+  Future<T> patch(String id, T record);
+}
+
+
+abstract class BaseFirestoreApi<T> implements IRepository<T>{
 
   BaseFirestoreApi(this.path);
   final String path;
