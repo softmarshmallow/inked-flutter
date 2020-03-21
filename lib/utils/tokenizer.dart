@@ -1,5 +1,5 @@
-class Tokenizer{
-  Tokenizer(this.content);
+class WordTokenizer{
+  WordTokenizer(this.content);
   final String content;
   List<String> tokens = [];
   List<String> tokenize(){

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inked/blocs/token_filter_tester/bloc.dart';
+import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
+import 'package:inked/dialogs/enter_custom_news.dart';
 import 'package:inked/utils/token_filter_processor.dart';
 import 'package:inked/widget/content_detail.dart';
 
@@ -29,7 +31,9 @@ class _TokenFilterTesterState extends State<TokenFilterTester> {
     bloc = BlocProvider.of<FilterTesterBloc>(context);
     return BlocBuilder<FilterTesterBloc, TokenFilterTesterViewState>(
       builder: (BuildContext context, TokenFilterTesterViewState state) {
-        if (state is! InitialState && state.news != null && state.filter != null) {
+        if (state is! InitialState &&
+            state.news != null &&
+            state.filter != null) {
           // update processor if not initial state. it is null to update processor when initial state
           processor = TokenFilterProcessor(state.news, state.filter);
           print('updated processor for tokenfilter testing');
@@ -54,10 +58,10 @@ class _TokenFilterTesterState extends State<TokenFilterTester> {
     );
   }
 
-  _buildNewsDisplaySection(BuildContext context, TokenFilterTesterViewState state){
+  _buildNewsDisplaySection(
+      BuildContext context, TokenFilterTesterViewState state) {
     return SizedBox(
-        width: 300,
-        height: 300,
+        width: MediaQuery.of(context).size.width/2,
         child: Column(
           children: <Widget>[
             RaisedButton(
@@ -69,6 +73,23 @@ class _TokenFilterTesterState extends State<TokenFilterTester> {
                 });
               },
             ),
+            RaisedButton(
+              child: Text("enter custom news"),
+              onPressed: () async {
+                var res = await showDialog(
+                    context: context,
+                    builder: (context) => EnterCustomNewsDialog());
+                if (res != null) {
+                  setState(() {
+                    try {
+                      bloc.add(TestNewsUpdateEvent(res as News));
+                    } catch (e) {
+                      print("error occured while submiting custom news e=\n$e");
+                    }
+                  });
+                }
+              },
+            ),
             ContentDetailView(
               state.news,
               readOnly: true,
@@ -77,11 +98,11 @@ class _TokenFilterTesterState extends State<TokenFilterTester> {
         ));
   }
 
-  _buildResultSection(BuildContext context, TokenFilterTesterViewState state){
+  _buildResultSection(BuildContext context, TokenFilterTesterViewState state) {
     if (processor != null) {
       var result = processor.process();
-      return Text(result.toString());
-    }  else{
+      return Text("result is $result, and action is ${state.filter.action}");
+    } else {
       return Text('no news or filter is provided');
     }
   }

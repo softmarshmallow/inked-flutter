@@ -36,10 +36,22 @@ class TokenFilterProcessor implements IFilterProcessor{
 
     switch(filter.operation){
       case OperationType.And:
-        // filter results && layer results should all be true
+      // filter results && layer results should all be true
+        for (var i in results){
+          if (!i) {
+            return false;
+          }
+        }
+        return true;
         break;
       case OperationType.Or:
         // one of filter results && layer results should be true
+        for (var i in results){
+          if (i) {
+            return true;
+          }
+        }
+        return false;
         break;
     }
   }
@@ -52,10 +64,10 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
   final News news;
   final SingleTokenFilterLayer layer;
   String content;
-  Tokenizer tokenizer;
+  WordTokenizer tokenizer;
   SingleTokenFilterLayerProcessor(this.news, this.layer){
     content = getTargetContent();
-    tokenizer = Tokenizer(content);
+    tokenizer = WordTokenizer(content)..tokenize();
   }
 
   @override
@@ -64,24 +76,28 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
   }
 
   bool processMatchLogic(){
-    // TODO inspect this logic
     bool matched = false;
-    tokenizer.tokens.forEach((token) {
-      switch(layer.match){
-        case FilterMatchType.Contains:
-          matched = token.contains(content);
-          break;
-        case FilterMatchType.Matches:
-          matched = token == content;
-          break;
-        case FilterMatchType.NotContains:
-          // TODO: Handle this case.
-          break;
-        case FilterMatchType.NotMatches:
-          // TODO: Handle this case.
-          break;
+    loop: for (var contentToken in tokenizer.tokens){
+      // if once matched, return anyway.
+      if (matched == true){
+        break loop;
       }
-    });
+      logic: switch(layer.match){
+        case FilterMatchType.Contains:
+          matched = content.contains(layer.token);
+          break logic;
+        case FilterMatchType.Matches:
+          matched = contentToken == layer.token;
+          break logic;
+        case FilterMatchType.NotContains:
+          matched = !content.contains(layer.token);
+          break logic;
+        case FilterMatchType.NotMatches:
+          matched = contentToken != layer.token;
+          break logic;
+      }
+      print("matched = $matched // contentToken = $contentToken // layer.token = ${layer.token} // logic = ${layer.match}");
+    }
     return matched;
   }
 

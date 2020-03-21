@@ -3,8 +3,8 @@ import 'package:inked/data/model/filter.dart';
 
 class MockFilterDatabase extends BaseMockDatabase<TokenFilter>{
 
-  static var filter = TokenFilter("demo", action: FilterAction.Notify, operation: OperationType.And, isRootFilter: true, isOn: true, filterLayers: [
-    SingleTokenFilterLayer(token: "[사진]", scope: FilterScope.Title, match: FilterMatchType.NotContains)
+  static var filter = TokenFilter("dont show if photo", action: FilterAction.Hide, operation: OperationType.And, isRootFilter: true, isOn: true, filterLayers: [
+    SingleTokenFilterLayer(token: "사진", scope: FilterScope.Title, match: FilterMatchType.Contains)
   ]);
 
   @override
