@@ -32,7 +32,7 @@ class MockNewsDatabase extends BaseMockDatabase<News>{
   }
 
   @override
-  Future patch(String re, record) {
+  Future update(String re, record) {
     // TODO: implement patch
     throw UnimplementedError();
   }

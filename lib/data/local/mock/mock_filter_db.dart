@@ -25,7 +25,7 @@ class MockFilterDatabase extends BaseMockDatabase<TokenFilter>{
   }
 
   @override
-  Future<TokenFilter> patch(String re, record) async{
+  Future<TokenFilter> update(String re, record) async{
     // TODO: implement patch
     throw UnimplementedError();
   }

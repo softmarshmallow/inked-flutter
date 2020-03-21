@@ -25,11 +25,54 @@ const LIST_MAX = 1000;
 class _LiveNewsListView extends State<LiveNewsListView> {
   final Dio dio = Dio();
   List<News> news = [];
+  NewsListBloc bloc;
 
   _LiveNewsListView() {
     RealtimeNewsReceiver().newsStream().listen((event) {
       addNews(event);
     });
+  }
+
+  onItemTap(News news) {
+    bloc.add(NewsFocusEvent(news));
+  }
+
+  onItemDoubleTap(News news) {
+    Navigator.of(context)
+        .pushNamed(ContentDetailScreen.routeName, arguments: news);
+  }
+
+  onItemLongPress(News news) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("quick action"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    news.title,
+                    style: Theme.of(context).textTheme.caption,
+                    maxLines: 1,
+                    textAlign: TextAlign.left,
+                  ),
+                  ListTile(
+                    title: Text("open news from site"),
+                    onTap: () {
+                      safelyLaunchURL(news.originUrl);
+                    },
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("close"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ));
   }
 
   void addNews(News newsItem) {
@@ -42,36 +85,59 @@ class _LiveNewsListView extends State<LiveNewsListView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    bloc = BlocProvider.of<NewsListBloc>(context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bloc.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return NewsListView(news);
+    return BlocBuilder<NewsListBloc, ListViewState>(builder: (context, state) {
+      return NewsListView(news,
+          defaultItemAction: NewsListItemActions(onItemTap,
+              onDoubleTap: onItemDoubleTap, onLongPress: onItemLongPress),
+        focusedNews: state.news,
+      );
+    });
   }
 }
 
 class NewsListView extends StatelessWidget {
   final List<News> news;
+  final News focusedNews;
   final ItemScrollController _scrollController = ItemScrollController();
+  BuildContext context;
 
-  NewsListView(this.news, {Key key}) : super(key: key);
+  NewsListView(this.news, {this.defaultItemAction, this.focusedNews, Key key})
+      : super(key: key);
+  final NewsListItemActions defaultItemAction;
 
   @override
   Widget build(BuildContext context) {
-    var bloc = BlocProvider.of<NewsListBloc>(context);
-    return BlocBuilder<NewsListBloc, ListViewState>(builder: (context, state) {
-      return Scrollbar(
-          child: news.isEmpty
-              ? Text("loading..")
-              : ScrollablePositionedList.builder(
-                  itemScrollController: _scrollController,
-                  itemCount: news.length,
-                  itemBuilder: (context, index) {
-                    var data = news[index];
-                    var isFocused = bloc.state.news != null
-                        ? data.id == bloc.state.news.id
-                        : false;
-                    return NewsListItem(data, isFocused: isFocused);
-                  },
-                ));
-    });
+    this.context = context;
+    return Scrollbar(
+        child: news.isEmpty
+            ? Text("loading..")
+            : ScrollablePositionedList.builder(
+                itemScrollController: _scrollController,
+                itemCount: news.length,
+                itemBuilder: (context, index) {
+                  var data = news[index];
+                  var isFocused =
+                      focusedNews != null ? data.id == focusedNews.id : false;
+                  return NewsListItem(
+                    data,
+                    isFocused: isFocused,
+                    actions: defaultItemAction,
+                  );
+                },
+              ));
   }
 
   _scrollToFocused() {
@@ -79,13 +145,22 @@ class NewsListView extends StatelessWidget {
   }
 }
 
+class NewsListItemActions {
+  NewsListItemActions(this.onTap, {this.onLongPress, this.onDoubleTap});
+
+  final Function(News news) onTap;
+  final Function(News news) onLongPress;
+  final Function(News news) onDoubleTap;
+}
+
 // region child
 class NewsListItem extends StatelessWidget {
   final News data;
+  NewsListItemActions actions;
   final bool isFocused;
   var api = NewsApi(RemoteApiManager().getDio());
 
-  NewsListItem(this.data, {this.isFocused = false});
+  NewsListItem(this.data, {this.isFocused = false, this.actions});
 
   var markedSpam = false;
 
@@ -185,47 +260,15 @@ class NewsListItem extends StatelessWidget {
   }
 
   void _onTap(BuildContext context) {
-    var bloc = BlocProvider.of<NewsListBloc>(context);
-    bloc.add(NewsFocusEvent(data));
-//    bloc.close();
+    actions?.onTap?.call(data);
   }
 
   void _onDoubleTap(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed(ContentDetailScreen.routeName, arguments: data);
+    actions?.onDoubleTap?.call(data);
   }
 
   void _onLongPress(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text("quick action"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    data.title,
-                    style: Theme.of(context).textTheme.caption,
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                  ),
-                  ListTile(
-                    title: Text("open news from site"),
-                    onTap: () {
-                      safelyLaunchURL(data.originUrl);
-                    },
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text("close"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            ));
+    actions?.onLongPress?.call(data);
   }
 }
 

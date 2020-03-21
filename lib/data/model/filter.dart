@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:inked/data/model/base.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'filter.g.dart';
@@ -6,15 +7,21 @@ part 'filter.g.dart';
 /// not using local db. using simple persistence data, since so. we use id as date mills
 
 @JsonSerializable()
-class TokenFilter{
+class TokenFilter implements IFirebaseModel{
   TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn, this.filterLayers=const []});
 
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
   String name = "untitled";
   FilterAction action = FilterAction.Notify;
+
   List<SingleTokenFilterLayer> filterLayers = [];
+
   List<TokenFilter> extraFilters = [];
+  //  @JsonKey(ignore: true)
+  // todo support relational
+  //  List<DocumentReference> extraFiltersReferences = [];
+
   OperationType operation = OperationType.And;
   bool isRootFilter = true;
   bool isOn = true;
@@ -24,7 +31,7 @@ class TokenFilter{
 }
 
 @JsonSerializable()
-class SingleTokenFilterLayer {
+class SingleTokenFilterLayer implements IFirebaseModel{
   SingleTokenFilterLayer({@required this.token, @required this.scope, this.match});
 
   @JsonKey(ignore: true)

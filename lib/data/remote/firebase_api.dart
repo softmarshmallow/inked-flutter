@@ -1,26 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inked/data/model/filter.dart';
 
-abstract class IRepository<T>{
-  Future<T> get (String id);
+abstract class IRepository<T> {
+  Future<T> get(String id);
+
   Future<T> create(T record);
+
   Future<List<T>> list();
-  Future<T> patch(String id, T record);
+
+  Future<T> update(String id, T record);
 }
 
-
-abstract class BaseFirestoreApi<T> implements IRepository<T>{
-
+abstract class BaseFirestoreApi<T> implements IRepository<T> {
   BaseFirestoreApi(this.path);
+
   final String path;
 
-  Future<T> get (String id) async {
-    var res = await Firestore.instance.collection(path).document(id).snapshots().first;
+  Future<T> get(String id) async {
+    var res = await Firestore.instance
+        .collection(path)
+        .document(id)
+        .snapshots()
+        .first;
     var downloaded = fromJson(res.data);
     seedId(downloaded, res.documentID);
     return downloaded;
   }
-
 
   Future<T> create(T record) async {
     var res = await Firestore.instance.collection(path).add(toJson(record));
@@ -29,27 +34,44 @@ abstract class BaseFirestoreApi<T> implements IRepository<T>{
     seedId(downloaded, uploaded.documentID);
     return downloaded;
   }
+
   Future<List<T>> list();
-  Future<T> patch(String id, T record) async {
-    var res = await Firestore.instance.collection(path).document(id).updateData(toJson(record));
+
+  Future<T> update(String id, T record) async {
+    var res = await Firestore.instance
+        .collection(path)
+        .document(id)
+        .updateData(toJson(record));
     return record;
   }
 
   T fromJson(Map<String, dynamic> map);
+
   Map<String, dynamic> toJson(T data);
+
   seedId(T data, String id);
 }
 
-
-class TokenFilterFirestoreApi extends BaseFirestoreApi<TokenFilter>{
+class TokenFilterFirestoreApi extends BaseFirestoreApi<TokenFilter> {
   TokenFilterFirestoreApi() : super("tokenfilters");
 
   @override
-  Future<List<TokenFilter>> list() async{
+  Future<List<TokenFilter>> list() async {
     var res = await Firestore.instance.collection(path).snapshots().first;
     print(res);
     return [];
     // todo
+  }
+
+  @override
+  Future<TokenFilter> create(TokenFilter record) async {
+//    return super.create(record);
+  }
+
+  @override
+  Future<TokenFilter> update(String id, TokenFilter record) async {
+//     TODO: implement update
+//    return super.update(id, record);
   }
 
   @override
@@ -60,23 +82,25 @@ class TokenFilterFirestoreApi extends BaseFirestoreApi<TokenFilter>{
 
   @override
   seedId(TokenFilter data, String id) => data.id = id;
-
 }
 
-class SingleTokenFilterLayerFirestoreApi extends BaseFirestoreApi<SingleTokenFilterLayer>{
+class SingleTokenFilterLayerFirestoreApi
+    extends BaseFirestoreApi<SingleTokenFilterLayer> {
   SingleTokenFilterLayerFirestoreApi() : super("single-token-filter-layers");
 
   @override
-  SingleTokenFilterLayer fromJson(Map<String, dynamic> map) => SingleTokenFilterLayer.fromJson(map);
+  SingleTokenFilterLayer fromJson(Map<String, dynamic> map) =>
+      SingleTokenFilterLayer.fromJson(map);
 
   @override
   Future<List<SingleTokenFilterLayer>> list() {
     // TODO: implement list
     throw UnimplementedError();
   }
+
   @override
   seedId(SingleTokenFilterLayer data, String id) => data.id = id;
+
   @override
   Map<String, dynamic> toJson(SingleTokenFilterLayer data) => data.toJson();
-  
 }
