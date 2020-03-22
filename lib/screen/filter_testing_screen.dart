@@ -52,7 +52,7 @@ class _FilterTestingScreenState extends State<FilterTestingScreen> {
       children: <Widget>[
         Text('select filter to test...'),
         RaisedButton(onPressed: (){
-          _bloc.add(TestFilterUpdateEvent(MockFilterDatabase.filter));
+          _bloc.add(TestFilterUpdateEvent(MockFilterDatabase.photoFilter));
         }, child:Text("use mock filter"),)
       ],
     );

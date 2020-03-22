@@ -6,15 +6,20 @@ part 'filter.g.dart';
 
 /// not using local db. using simple persistence data, since so. we use id as date mills
 
+abstract class NewsFilter{
+  String name;
+  FilterAction action;
+}
+
+
 @JsonSerializable()
-class TokenFilter implements IFirebaseModel{
-  TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn, this.filterLayers=const []});
+class TokenFilter extends NewsFilter implements IFirebaseModel{
+  TokenFilter(this.name, {this.action, this.operation, this.isRootFilter, this.isOn, this.filterLayers, this.extraFilters});
 
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
   String name = "untitled";
   FilterAction action = FilterAction.Notify;
-
   List<SingleTokenFilterLayer> filterLayers = [];
 
   List<TokenFilter> extraFilters = [];
@@ -63,10 +68,21 @@ enum FilterMatchType{
 
 enum FilterAction{
   Hide,
-  Notify
+  Notify,
+  None
 }
 
 enum FilterScope{
   Title,
   Body
+}
+
+class FilterResult{
+  FilterResult(this.matched, {this.action, this.filter});
+  final bool matched;
+  final FilterAction action;
+  final NewsFilter filter;
+
+  @override
+  String toString() => "filter >> ${filter.name} matched >> $matched action >> $action";
 }

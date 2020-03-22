@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inked/data/local/mock/mock_filter_db.dart';
+import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/realtime_news_receiver.dart';
 import 'package:inked/data/repository/news_repository.dart';
+import 'package:inked/utils/token_filter_processor.dart';
 
 abstract class NewsListEvent extends Equatable {
   const NewsListEvent();
@@ -28,20 +31,21 @@ class NewNewsEvent extends NewsListEvent {
 }
 
 abstract class NewsListState extends Equatable {
-  const NewsListState(this.news);
+  const NewsListState(this.news, this.newses);
 
   final News news;
+  final List<News> newses;
 
   @override
   List<Object> get props => [news];
 }
 
 class NoFocusState extends NewsListState {
-  NoFocusState() : super(null);
+  NoFocusState() : super(null, []);
 }
 
 class FocusedState extends NewsListState {
-  FocusedState(News news) : super(news);
+  FocusedState(News news) : super(news, NewsRepository.NEWS_LIST);
 }
 
 class FocusedStillState extends FocusedState{
@@ -53,7 +57,7 @@ class FocusedStillState extends FocusedState{
 }
 
 class TopFocusState extends NewsListState {
-  TopFocusState(News news) : super(news);
+  TopFocusState(News news) : super(news, NewsRepository.NEWS_LIST);
 }
 
 class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
@@ -65,9 +69,19 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
 
   NewsListBloc() {
     RealtimeNewsReceiver().newsStream().listen((news) {
+      // todo process with filters
+      _runFilters(news);
       NewsRepository.addNews(news);
       add(NewNewsEvent(news));
     });
+  }
+
+  List<NewsFilter> filters = [MockFilterDatabase.mainFilter];
+  _runFilters(News news){
+    var filter = filters.first;
+    var processor = TokenFilterProcessor(news, filter);
+    var res = processor.process();
+    news.filterResult = FilterResult(res, filter: filter, action: filter.action);
   }
 
   @override
@@ -77,13 +91,9 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
       _focusType = NewsItemFocusType.Focused;
       yield FocusedState(_focusedNews);
     } else if (event is NewNewsEvent) {
-      print("new news event. focus >>> ${_focusType}. news >>> ${event.news}");
       switch (_focusType) {
         case NewsItemFocusType.Focused:
-//          print('case:: focused');
           yield new FocusedStillState(_focusedNews, event.news);
-//          yield TopFocusState(_focusedNews);
-
           break;
         case NewsItemFocusType.NoFocus:
           yield NoFocusState();

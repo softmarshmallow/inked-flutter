@@ -1,3 +1,4 @@
+import 'package:inked/data/model/filter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'news.g.dart';
@@ -20,6 +21,9 @@ class News{
   DateTime time = DateTime.now();
   @JsonKey(ignore: true)
   List<String> tags = [];
+
+  @JsonKey(ignore: true)
+  FilterResult filterResult;
 
   factory News.fromJson(Map<String, dynamic> json) => _$NewsFromJson(json);
   Map<String, dynamic> toJson() => _$NewsToJson(this);

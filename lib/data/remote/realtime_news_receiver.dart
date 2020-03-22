@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:eventsource/eventsource.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
@@ -20,12 +17,6 @@ class RealtimeNewsReceiver {
   RealtimeNewsReceiver._internal();
 
   // endregion
-
-  final channel = HtmlWebSocketChannel.connect('ws://$server/ws/news/');
-  Future<EventSource> eventSource = EventSource.connect(
-      "http://$server/api/events/",
-      client: http.BrowserClient());
-
   static const _interval = Duration(seconds: 5, milliseconds: 0);
   Stream<News> newsStream() async* {
     String lastNewsId;

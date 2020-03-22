@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inked/blocs/token_filter_tester/bloc.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/dialogs/edit_token_filter_layer_dialog.dart';
 import 'package:inked/widget/section.dart';
+import 'package:inked/widget/singletokenfilterlayer_listtile.dart';
 import 'package:inked/widget/token_filter_tester.dart';
 
 class FilterCreateScreen extends StatefulWidget {
@@ -15,7 +18,7 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   TokenFilter filter = new TokenFilter("untitled",
-      action: FilterAction.Hide, isOn: true, isRootFilter: true);
+      action: FilterAction.Hide, isOn: true, isRootFilter: true, filterLayers: []);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,11 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
                   padding: EdgeInsetsDirectional.only(top: 24),
                   child: _buildSummaryText(),
                 ),
-                TokenFilterTester()
+//                BlocProvider(
+//                    create: (context) {
+//                      return FilterTesterBloc();
+//                    },
+//                    child: TokenFilterTester()),
               ],
             ),
           )),
@@ -79,18 +86,19 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
           ListView.builder(
               itemBuilder: (c, i) {
                 final data = filter.filterLayers[i];
-                return ListTile(
-                    leading: Icon(Icons.text_fields),
-                    title: Text("\"${data.token}\" in ${data.scope}"),
-                    subtitle: Text("${data.scope} ${data.match}"),
-                    trailing: IconButton(
+                return SingleTokenLayerListTile(
+                  data,
+                  trails: <Widget>[
+                    IconButton(
                       icon: Icon(Icons.remove_circle_outline),
                       onPressed: () {
                         setState(() {
                           filter.filterLayers.remove(data);
                         });
                       },
-                    ));
+                    )
+                  ],
+                );
               },
               itemCount: filter.filterLayers.length,
               shrinkWrap: true),
@@ -102,6 +110,7 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
                   builder: (BuildContext context) =>
                       EditTokenFilterLayerDialog());
               if (layer != null) {
+                print('received create layer >> $layer');
                 setState(() {
                   filter.filterLayers.add(layer);
                 });
@@ -139,17 +148,19 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
               ],
             ),
           ),
-          Section("root filter", child: CheckboxListTile(
-            title: Text("use this as root filter"),
-            value: filter.isRootFilter,
-            onChanged: (v) {
-              setState(() {
-                filter.isRootFilter = v;
-              });
-            },
-            controlAffinity: ListTileControlAffinity.leading,
-          ),),
-
+          Section(
+            "root filter",
+            child: CheckboxListTile(
+              title: Text("use this as root filter"),
+              value: filter.isRootFilter,
+              onChanged: (v) {
+                setState(() {
+                  filter.isRootFilter = v;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+          ),
           filter.isRootFilter
               ? Section(
                   "action",

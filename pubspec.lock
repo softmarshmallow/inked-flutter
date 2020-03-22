@@ -211,13 +211,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
-  eventsource:
-    dependency: "direct main"
-    description:
-      name: eventsource
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.2"
   firebase:
     dependency: transitive
     description:
@@ -279,6 +272,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.11.1"
+  flutter_socket_io:
+    dependency: "direct main"
+    description:
+      name: flutter_socket_io
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -637,13 +637,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  sync:
-    dependency: transitive
-    description:
-      name: sync
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   term_glyph:
     dependency: transitive
     description:
@@ -729,7 +722,7 @@ packages:
     source: hosted
     version: "0.9.7+13"
   web_socket_channel:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: web_socket_channel
       url: "https://pub.dartlang.org"

@@ -24,12 +24,14 @@ class TokenFilterProcessor implements IFilterProcessor{
     List<bool> filterResults = [];
     // only run sub filters if it is root filter
     if (filter.isRootFilter){
-      filter.extraFilters.forEach((eFilter) {
-        if (eFilter.isOn){
-          var result = TokenFilterProcessor(news, eFilter).process();
-          filterResults.add(result);
-        }
-      });
+      if (filter.extraFilters != null) {
+        filter.extraFilters.forEach((eFilter) {
+          if (eFilter.isOn){
+            var result = TokenFilterProcessor(news, eFilter).process();
+            filterResults.add(result);
+          }
+        });
+      }
     }
 
     results..addAll(layerResults)..addAll(filterResults);
@@ -54,6 +56,7 @@ class TokenFilterProcessor implements IFilterProcessor{
         return false;
         break;
     }
+    return false;
   }
 
   @override
@@ -77,10 +80,11 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
 
   bool processMatchLogic(){
     bool matched = false;
-    loop: for (var contentToken in tokenizer.tokens){
+    for (var contentToken in tokenizer.tokens){
       // if once matched, return anyway.
       if (matched == true){
-        break loop;
+        print("matched = $matched // contentToken = $contentToken // layer.token = ${layer.token} // logic = ${layer.match} // content = $content");
+        return matched;
       }
       logic: switch(layer.match){
         case FilterMatchType.Contains:
@@ -96,7 +100,6 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
           matched = contentToken != layer.token;
           break logic;
       }
-      print("matched = $matched // contentToken = $contentToken // layer.token = ${layer.token} // logic = ${layer.match}");
     }
     return matched;
   }

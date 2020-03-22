@@ -1,9 +1,8 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/blocs/newslist/bloc.dart';
+import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
@@ -11,21 +10,13 @@ import 'package:inked/data/repository/news_repository.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
-
-final logger = Logger();
 
 class LiveNewsListView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _LiveNewsListView();
 }
 
-
-
-
 class _LiveNewsListView extends State<LiveNewsListView> {
-  final Dio dio = Dio();
-//  List<News> news = [];
   NewsListBloc bloc;
 
   onItemTap(News news) {
@@ -85,10 +76,10 @@ class _LiveNewsListView extends State<LiveNewsListView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
-      print('new state received >> ${state.runtimeType}');
-      return NewsListView(NewsRepository.NEWS_LIST,
-          defaultItemAction: NewsListItemActions(onItemTap,
-              onDoubleTap: onItemDoubleTap, onLongPress: onItemLongPress),
+      return NewsListView(
+        state.newses,
+        defaultItemAction: NewsListItemActions(onItemTap,
+            onDoubleTap: onItemDoubleTap, onLongPress: onItemLongPress),
         focusedNews: state.news,
       );
     });
@@ -100,13 +91,16 @@ class NewsListView extends StatelessWidget {
   final News focusedNews;
   final ItemScrollController _scrollController = ItemScrollController();
   BuildContext context;
+  int focusedIndex;
 
   NewsListView(this.news, {this.defaultItemAction, this.focusedNews, Key key})
       : super(key: key);
   final NewsListItemActions defaultItemAction;
+  var api = NewsApi(RemoteApiManager().getDio());
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToFocused());
     this.context = context;
     return Scrollbar(
         child: news.isEmpty
@@ -118,17 +112,37 @@ class NewsListView extends StatelessWidget {
                   var data = news[index];
                   var isFocused =
                       focusedNews != null ? data.id == focusedNews.id : false;
+                  if (isFocused) focusedIndex = index;
                   return NewsListItem(
                     data,
                     isFocused: isFocused,
                     actions: defaultItemAction,
+                    trail: data.filterResult != null && data.filterResult.matched && data.filterResult.action == FilterAction.Hide ? [] : <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.report),
+                        onPressed: () {
+                          // mark as spam
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
+                          api.markSpamNews(
+                              SpamMarkRequest(id: data.id, is_spam: true));
+                        },
+                      )
+                    ],
                   );
                 },
               ));
   }
 
   _scrollToFocused() {
-    _scrollController.jumpTo(index: 12);
+    // todo this is not working
+    if (_scrollController.isAttached) {
+      if (focusedIndex != null) {
+        _scrollController.scrollTo(
+            index: focusedIndex, duration: Duration(milliseconds: 200));
+      }
+    }
   }
 }
 
@@ -144,10 +158,26 @@ class NewsListItemActions {
 class NewsListItem extends StatelessWidget {
   final News data;
   NewsListItemActions actions;
+  final List<Widget> trail;
   final bool isFocused;
-  var api = NewsApi(RemoteApiManager().getDio());
+  Color _textColor = Colors.black;
 
-  NewsListItem(this.data, {this.isFocused = false, this.actions});
+  NewsListItem(this.data, {this.isFocused = false, this.actions, this.trail}){
+    // initialize global text color by filter status
+    if (data.filterResult != null && data.filterResult.matched) {
+      switch(data.filterResult.action){
+        case FilterAction.Hide:
+          _textColor = Colors.black45;
+          break;
+        case FilterAction.Notify:
+          _textColor = Colors.red;
+          break;
+        case FilterAction.None:
+          _textColor = Colors.black;
+          break;
+      }
+    }
+  }
 
   var markedSpam = false;
 
@@ -166,14 +196,13 @@ class NewsListItem extends StatelessWidget {
         child: Container(
           color: isFocused ? Colors.grey : null,
           padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
-          height: 100,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 DateFormat().add_Hms().format(data.time),
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.subtitle1.copyWith(color: _textColor),
               ),
               SizedBox(
                 width: 12,
@@ -184,23 +213,10 @@ class NewsListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    "content snippet",
-                    style: Theme.of(context).textTheme.subtitle1,
+                    "${data.provider}",
+                    style: Theme.of(context).textTheme.caption.copyWith(color: _textColor),
                   ),
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.report),
-                        color: !markedSpam ? Colors.black : Colors.red,
-                        onPressed: () {
-                          // mark as spam
-                          markedSpam = true;
-                          api.markSpamNews(
-                              SpamMarkRequest(id: data.id, is_spam: true));
-                        },
-                      )
-                    ],
-                  )
+                  trail != null ? Row(children: trail) : SizedBox.shrink()
                 ],
               ),
             ],
@@ -209,6 +225,23 @@ class NewsListItem extends StatelessWidget {
   }
 
   Widget _buildContentSection(BuildContext context) {
+    var titleTextStyle = Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
+    if (data.filterResult != null && data.filterResult.matched) {
+      print("${data.title} ${data.filterResult}");
+      switch(data.filterResult.action){
+        case FilterAction.Hide:
+          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.w300);
+          break;
+        case FilterAction.Notify:
+          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.w800);
+          break;
+        case FilterAction.None:
+          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.normal);
+          break;
+      }
+    }
+
+
     return Expanded(
         flex: 10,
         child: Column(
@@ -218,7 +251,7 @@ class NewsListItem extends StatelessWidget {
               data.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.headline6,
+              style: titleTextStyle,
             ),
             _buildContentSnippetSection(context)
           ],
