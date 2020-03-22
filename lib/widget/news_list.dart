@@ -250,7 +250,7 @@ class NewsListItem extends StatelessWidget {
       print("${data.title} ${data.filterResult}");
       switch(data.filterResult.action){
         case FilterAction.Hide:
-          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.w300);
+          titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(fontWeight: FontWeight.w300);
           break;
         case FilterAction.Notify:
           titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.w800);
