@@ -12,6 +12,8 @@ import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
 
 class LiveNewsListView extends StatefulWidget {
+  final api = NewsApi(RemoteApiManager().getDio());
+
   @override
   State<StatefulWidget> createState() => _LiveNewsListView();
 }
@@ -46,6 +48,24 @@ class _LiveNewsListView extends State<LiveNewsListView> {
                     title: Text("open news from site"),
                     onTap: () {
                       safelyLaunchURL(news.originUrl);
+                    },
+                  ),
+                  ListTile(
+                    title: Text("mark as spam"),
+                    onTap: () {
+                      widget.api.markSpamNews(SpamMarkRequest(id: news.id, is_spam: true));
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Thanks for the feedback. \"${news.title}\" has been marked as spam.')));
+                    },
+                  ),
+                  ListTile(
+                    title: Text("mark as NOT spam"),
+                    onTap: () {
+                      widget.api.markSpamNews(SpamMarkRequest(id: news.id, is_spam: false));
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Thanks for the feedback. \"${news.title}\" has been marked as NOT spam.')));
                     },
                   ),
                 ],
