@@ -253,7 +253,7 @@ class NewsListItem extends StatelessWidget {
           titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(fontWeight: FontWeight.w300);
           break;
         case FilterAction.Notify:
-          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.w800);
+          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.bold);
           break;
         case FilterAction.None:
           titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.normal);
