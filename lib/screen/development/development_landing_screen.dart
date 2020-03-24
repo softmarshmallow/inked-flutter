@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
+import 'package:inked/screen/development/socketio_development_screen.dart';
 
 class DevelopmentLandingScreen extends StatefulWidget {
   static const routeName = "development/";
@@ -35,6 +36,13 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
               title: Text('dev - firestore'),
               onTap: () {
                 Navigator.of(context).pushNamed(FirestoreTestScreen.routeName);
+              },
+            ),
+
+            ListTile(
+              title: Text('dev - socket io'),
+              onTap: () {
+                Navigator.of(context).pushNamed(SocketioDevelopmentScreen.routeName);
               },
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
+import 'package:inked/screen/development/socketio_development_screen.dart';
 import 'package:inked/screen/filter_create_screen.dart';
 import 'package:inked/screen/filter_settings_screen.dart';
 import 'package:inked/screen/filter_testing_screen.dart';
@@ -20,6 +21,7 @@ Map<String, WidgetBuilder> buildRoutes(BuildContext context){
     // region development
     DevelopmentLandingScreen.routeName: (context) => DevelopmentLandingScreen(),
     FirestoreTestScreen.routeName: (context) => FirestoreTestScreen(),
+    SocketioDevelopmentScreen.routeName: (context) => SocketioDevelopmentScreen(),
     // endregion
   };
 }
