@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: buildMainDrawer(context),
         body: Stack(
-//          children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
+          children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
         ),
         floatingActionButton: _buildFab(context, state),
       );

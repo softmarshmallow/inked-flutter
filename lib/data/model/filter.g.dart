@@ -13,16 +13,16 @@ TokenFilter _$TokenFilterFromJson(Map<String, dynamic> json) {
     operation: _$enumDecodeNullable(_$OperationTypeEnumMap, json['operation']),
     isRootFilter: json['isRootFilter'] as bool,
     isOn: json['isOn'] as bool,
-  )
-    ..filterLayers = (json['filterLayers'] as List)
+    filterLayers: (json['filterLayers'] as List)
         ?.map((e) => e == null
             ? null
             : SingleTokenFilterLayer.fromJson(e as Map<String, dynamic>))
-        ?.toList()
-    ..extraFilters = (json['extraFilters'] as List)
+        ?.toList(),
+    extraFilters: (json['extraFilters'] as List)
         ?.map((e) =>
             e == null ? null : TokenFilter.fromJson(e as Map<String, dynamic>))
-        ?.toList();
+        ?.toList(),
+  );
 }
 
 Map<String, dynamic> _$TokenFilterToJson(TokenFilter instance) =>
@@ -69,8 +69,9 @@ T _$enumDecodeNullable<T>(
 }
 
 const _$FilterActionEnumMap = {
-  FilterAction.Hide: 'Ignore',
+  FilterAction.Hide: 'Hide',
   FilterAction.Notify: 'Notify',
+  FilterAction.None: 'None',
 };
 
 const _$OperationTypeEnumMap = {
@@ -83,7 +84,8 @@ SingleTokenFilterLayer _$SingleTokenFilterLayerFromJson(
   return SingleTokenFilterLayer(
     token: json['token'] as String,
     scope: _$enumDecodeNullable(_$FilterScopeEnumMap, json['scope']),
-  )..match = _$enumDecodeNullable(_$MatchTypeEnumMap, json['match']);
+    match: _$enumDecodeNullable(_$FilterMatchTypeEnumMap, json['match']),
+  );
 }
 
 Map<String, dynamic> _$SingleTokenFilterLayerToJson(
@@ -91,7 +93,7 @@ Map<String, dynamic> _$SingleTokenFilterLayerToJson(
     <String, dynamic>{
       'token': instance.token,
       'scope': _$FilterScopeEnumMap[instance.scope],
-      'match': _$MatchTypeEnumMap[instance.match],
+      'match': _$FilterMatchTypeEnumMap[instance.match],
     };
 
 const _$FilterScopeEnumMap = {
@@ -99,7 +101,9 @@ const _$FilterScopeEnumMap = {
   FilterScope.Body: 'Body',
 };
 
-const _$MatchTypeEnumMap = {
+const _$FilterMatchTypeEnumMap = {
   FilterMatchType.Contains: 'Contains',
   FilterMatchType.Matches: 'Matches',
+  FilterMatchType.NotContains: 'NotContains',
+  FilterMatchType.NotMatches: 'NotMatches',
 };

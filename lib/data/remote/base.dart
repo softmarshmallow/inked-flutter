@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 const String baseUrl = "http://$server/api/";
 
-const String server = "13.209.232.176:8001";
+const String server = "13.209.232.176:3000";
 
 
 class RemoteApiManager {

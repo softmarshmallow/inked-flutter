@@ -7,18 +7,22 @@ part 'news.g.dart';
 class News{
 
   News({this.title, this.content, this.provider, this.time, this.tags});
-  @JsonKey(name: 'article_id')
+  @JsonKey(name: 'id')
   String id;
   @JsonKey(name: 'title')
   String title;
-  @JsonKey(name: 'body_html')
+  @JsonKey(name: 'content')
   String content;
   @JsonKey(name: 'provider')
   String provider;
-  @JsonKey(name: 'origin_url')
+  @JsonKey(name: 'originUrl')
   String originUrl;
   @JsonKey(name: 'time')
   DateTime time = DateTime.now();
+
+  @JsonKey(name: 'meta')
+  NewsMeta meta;
+
   @JsonKey(ignore: true)
   List<String> tags = [];
 
@@ -30,4 +34,21 @@ class News{
 
   @override
   String toString() => "${time.toIso8601String()}: $title";
+}
+
+
+@JsonSerializable()
+class NewsMeta{
+  NewsMeta();
+  String source;
+  String subject;
+  List<String> tags;
+  String status;
+  List<String> categories;
+  String category;
+  DateTime crawledAt;
+  String summary;
+
+  factory NewsMeta.fromJson(Map<String, dynamic> json) => _$NewsMetaFromJson(json);
+  Map<String, dynamic> toJson() => _$NewsMetaToJson(this);
 }

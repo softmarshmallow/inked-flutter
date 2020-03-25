@@ -26,7 +26,7 @@ Map<String, dynamic> _$SpamMarkRequestToJson(SpamMarkRequest instance) =>
 class _NewsApi implements NewsApi {
   _NewsApi(this._dio, {this.baseUrl}) {
     ArgumentError.checkNotNull(_dio, '_dio');
-    this.baseUrl ??= 'http://13.209.232.176:8001/api/';
+    this.baseUrl ??= 'http://13.209.232.176:3000/api/';
   }
 
   final Dio _dio;
@@ -98,7 +98,7 @@ class _NewsApi implements NewsApi {
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final Response<Map<String, dynamic>> _result = await _dio.request(
-        '/news/spam',
+        '/news/tag/spam',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'GET',
@@ -117,7 +117,7 @@ class _NewsApi implements NewsApi {
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(req?.toJson() ?? <String, dynamic>{});
-    final Response<int> _result = await _dio.request('/news/spam',
+    final Response<int> _result = await _dio.request('/news/tag/spam',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'PATCH',

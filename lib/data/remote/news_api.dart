@@ -21,10 +21,10 @@ abstract class NewsApi {
   Future<List<News>> getLastNews(
       {@Query("page") String page = '1', @Query("count") int count=100});
 
-  @GET("/news/spam")
+  @GET("/news/tag/spam")
   Future<News> getSpamNews();
 
-  @PATCH("/news/spam")
+  @PATCH("/news/tag/spam")
   Future<int> markSpamNews(@Body() SpamMarkRequest req);
 }
 
