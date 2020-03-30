@@ -5,7 +5,6 @@ part 'news.g.dart';
 
 @JsonSerializable()
 class News{
-
   News({this.title, this.content, this.provider, this.time, this.tags});
   @JsonKey(name: 'id')
   String id;
@@ -36,10 +35,10 @@ class News{
   String toString() => "${time.toIso8601String()}: $title";
 }
 
-
 @JsonSerializable()
-class NewsMeta{
+class NewsMeta {
   NewsMeta();
+
   String source;
   String subject;
   List<String> tags;
@@ -47,8 +46,30 @@ class NewsMeta{
   List<String> categories;
   String category;
   DateTime crawledAt;
+  List<SpamMark> spamMarks;
   String summary;
 
-  factory NewsMeta.fromJson(Map<String, dynamic> json) => _$NewsMetaFromJson(json);
+  factory NewsMeta.fromJson(Map<String, dynamic> json) =>
+      _$NewsMetaFromJson(json);
+
   Map<String, dynamic> toJson() => _$NewsMetaToJson(this);
+}
+
+@JsonSerializable()
+class SpamMark {
+  SpamMark();
+  DateTime at;
+  SpamTag spam;
+  String reason;
+
+  factory SpamMark.fromJson(Map<String, dynamic> json) =>
+      _$SpamMarkFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SpamMarkToJson(this);
+}
+
+enum SpamTag {
+  SPAM,
+  NOTSPAM,
+  UNTAGGED,
 }
