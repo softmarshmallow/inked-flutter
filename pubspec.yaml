@@ -59,6 +59,7 @@ dependencies:
   # ui
   flutter_widgets: ^0.1.11
   after_layout: ^1.0.7+2
+  flutter_markdown: ^0.3.4
 
 
 dev_dependencies:

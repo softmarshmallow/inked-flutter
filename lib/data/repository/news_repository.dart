@@ -8,8 +8,6 @@ class NewsRepository{
       var conflictIndex = NEWS_LIST.indexWhere((element) => element.id == newsItem.id);
       NEWS_LIST.removeAt(conflictIndex);
       NEWS_LIST.insert(conflictIndex, newsItem);
-//      conflictIndex.meta = newsItem.meta;
-      print("replaced news");
       return true;
     }catch(e){}
 

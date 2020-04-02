@@ -8,6 +8,7 @@ import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/data/repository/news_repository.dart';
 import 'package:inked/screen/content_detail_screen.dart';
+import 'package:inked/utils/date/datetime_utls.dart';
 import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
 
@@ -53,7 +54,8 @@ class _LiveNewsListView extends State<LiveNewsListView> {
                   ListTile(
                     title: Text("mark as spam"),
                     onTap: () {
-                      widget.api.markSpamNews(SpamMarkRequest(id: news.id, is_spam: true));
+                      widget.api.markSpamNews(
+                          SpamMarkRequest(id: news.id, is_spam: true));
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               'Thanks for the feedback. \"${news.title}\" has been marked as spam.')));
@@ -62,7 +64,8 @@ class _LiveNewsListView extends State<LiveNewsListView> {
                   ListTile(
                     title: Text("mark as NOT spam"),
                     onTap: () {
-                      widget.api.markSpamNews(SpamMarkRequest(id: news.id, is_spam: false));
+                      widget.api.markSpamNews(
+                          SpamMarkRequest(id: news.id, is_spam: false));
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               'Thanks for the feedback. \"${news.title}\" has been marked as NOT spam.')));
@@ -137,19 +140,23 @@ class NewsListView extends StatelessWidget {
                     data,
                     isFocused: isFocused,
                     actions: defaultItemAction,
-                    trail: data.filterResult != null && data.filterResult.matched && data.filterResult.action == FilterAction.Hide ? [] : <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.report),
-                        onPressed: () {
-                          // mark as spam
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
-                          api.markSpamNews(
-                              SpamMarkRequest(id: data.id, is_spam: true));
-                        },
-                      )
-                    ],
+                    trail: data.filterResult != null &&
+                            data.filterResult.matched &&
+                            data.filterResult.action == FilterAction.Hide
+                        ? []
+                        : <Widget>[
+                            IconButton(
+                              icon: Icon(Icons.report),
+                              onPressed: () {
+                                // mark as spam
+                                Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
+                                api.markSpamNews(SpamMarkRequest(
+                                    id: data.id, is_spam: true));
+                              },
+                            )
+                          ],
                   );
                 },
               ));
@@ -180,17 +187,25 @@ class NewsListItem extends StatelessWidget {
   NewsListItemActions actions;
   final List<Widget> trail;
   final bool isFocused;
+  final TimeFormatType timeFormatType;
+  final Widget bottom;
   Color _textColor = Colors.black;
 
-  NewsListItem(this.data, {this.isFocused = false, this.actions, this.trail}){
-
+  NewsListItem(this.data,
+      {this.bottom,
+      this.isFocused = false,
+      this.actions,
+      this.trail,
+      this.timeFormatType = TimeFormatType.TODAY}) {
     // todo change logic later....
     // if spam mark filter result
     if (data.meta.spamMarks != null) {
       data.meta.spamMarks.forEach((element) {
-        switch (element.spam){
+        switch (element.spam) {
           case SpamTag.SPAM:
-            data.filterResult = FilterResult(true, action: FilterAction.Hide, filter: TokenFilter("server matching"));
+            data.filterResult = FilterResult(true,
+                action: FilterAction.Hide,
+                filter: TokenFilter("server matching"));
             break;
           case SpamTag.NOTSPAM:
             break;
@@ -202,7 +217,7 @@ class NewsListItem extends StatelessWidget {
 
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
-      switch(data.filterResult.action){
+      switch (data.filterResult.action) {
         case FilterAction.Hide:
           _textColor = Colors.black45;
           break;
@@ -231,52 +246,73 @@ class NewsListItem extends StatelessWidget {
           _onLongPress(context);
         },
         child: Container(
-          color: isFocused ? Colors.grey : null,
-          padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                DateFormat().add_Hms().format(data.time),
-                style: Theme.of(context).textTheme.subtitle1.copyWith(color: _textColor),
-              ),
-              SizedBox(
-                width: 12,
-              ),
-              _buildContentSection(context),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    "${data.provider}",
-                    style: Theme.of(context).textTheme.caption.copyWith(color: _textColor),
-                  ),
-                  trail != null ? Row(children: trail) : SizedBox.shrink()
-                ],
-              ),
-            ],
-          ),
-        ));
+            color: isFocused ? Colors.grey : null,
+            padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      formatTimeHuman(data.time, timeFormatType),
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle1
+                          .copyWith(color: _textColor),
+                    ),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    _buildContentSection(context),
+                    Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          "${data.provider}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              .copyWith(color: _textColor),
+                        ),
+                        trail != null ? Row(children: trail) : SizedBox.shrink()
+                      ],
+                    ),
+                  ],
+                ),
+                _buildBottom(),
+              ],
+            )));
+  }
+
+  Widget _buildBottom() {
+    if (this.bottom != null) {
+      return this.bottom;
+    }
+    return SizedBox.shrink();
   }
 
   Widget _buildContentSection(BuildContext context) {
-    var titleTextStyle = Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
+    var titleTextStyle =
+        Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
     if (data.filterResult != null && data.filterResult.matched) {
-      switch(data.filterResult.action){
+      switch (data.filterResult.action) {
         case FilterAction.Hide:
-          titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(fontWeight: FontWeight.w300);
+          titleTextStyle = Theme.of(context)
+              .textTheme
+              .subtitle2
+              .copyWith(fontWeight: FontWeight.w300);
           break;
         case FilterAction.Notify:
           titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.bold);
           break;
         case FilterAction.None:
-          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.normal);
+          titleTextStyle =
+              titleTextStyle.copyWith(fontWeight: FontWeight.normal);
           break;
       }
     }
-
 
     return Expanded(
         flex: 10,
