@@ -3,6 +3,7 @@ import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/filter_settings_screen.dart';
 import 'package:inked/screen/filter_testing_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
+import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
 
 Widget buildMainDrawer(BuildContext context) {
@@ -22,6 +23,13 @@ Widget buildMainDrawer(BuildContext context) {
           title: Text('filter'),
           onTap: () {
             Navigator.of(context).pushNamed(FilterSettingsScreen.routeName);
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.search),
+          title: Text('search'),
+          onTap: () {
+            Navigator.of(context).pushNamed(SearchScreen.routeName);
           },
         ),
         ListTile(

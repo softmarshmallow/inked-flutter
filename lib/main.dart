@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/dialogs/search_dialog.dart';
+import 'package:inked/utils/keyboard_shortcut/keyboard_shortcut_handler.dart';
+import 'package:inked/utils/keyboard_shortcut/shortcut_body.dart';
 import 'package:inked/utils/routes.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
@@ -108,6 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _onSearchPressed() {
+    _openSearchDialog();
+  }
+
+  _openSearchDialog() {
     showDialog(
         context: context, builder: (BuildContext context) => SearchDialog());
   }
