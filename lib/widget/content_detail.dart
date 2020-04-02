@@ -78,6 +78,9 @@ class _ContentDetailView extends State<ContentDetailView> {
   Widget _buildContentSection() {
     return Html(
       data: widget.news.content,
+      onLinkTap: (link){
+        safelyLaunchURL(link);
+      },
       padding: EdgeInsets.all(12),
     );
   }

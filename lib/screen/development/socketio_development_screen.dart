@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:inked/data/model/news_receive.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketioDevelopmentScreen extends StatefulWidget {
@@ -12,27 +15,25 @@ class SocketioDevelopmentScreen extends StatefulWidget {
 }
 
 class _SocketioDevelopmentScreenState extends State<SocketioDevelopmentScreen> {
-  String message = "";
+  NewsReceiveEvent data;
 
   @override
   void initState() {
     super.initState();
-    IO.Socket socket = IO.io('http://localhost:3001/client', <String, dynamic>{
+    IO.Socket socket = IO.io('http://13.209.232.176:3001/client', <String, dynamic>{
 //      'transports': ['websocket'],
     });
     socket.on('connect', (_) {
-      print('connect');
-      socket.emitWithAck('mocknews', '', ack:(d){
-        print(d);
-        setState(() {
-          message = d;
-        });
+      print("socket io client connected");
+    });
+
+    socket.on("news", (event) {
+      event = NewsReceiveEvent.fromJson({
+        "data": event["data"],
+        "type": event["type"]
       });
-      socket.on('feed', (data) {
-        print(data);
-        setState(() {
-          message = data;
-        });
+      setState(() {
+        this.data = event;
       });
     });
   }
@@ -43,7 +44,7 @@ class _SocketioDevelopmentScreenState extends State<SocketioDevelopmentScreen> {
       appBar: AppBar(
         title: Text('socket io'),
       ),
-      body: Text(message),
+      body: data != null ? Text("${data.type} :: ${data.data.title}") : SizedBox.shrink(),
     );
   }
 }

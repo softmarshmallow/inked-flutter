@@ -68,11 +68,12 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
   News _focusedNews;
 
   NewsListBloc() {
-    RealtimeNewsReceiver().newsStream().listen((news) {
-      // todo process with filters
-      _runFilters(news);
-      NewsRepository.addNews(news);
-      add(NewNewsEvent(news));
+    RealtimeNewsReceiver().steam().listen((news) {
+//      _runFilters(news);
+      var isAdded = NewsRepository.addNews(news);
+      if (isAdded) {
+        add(NewNewsEvent(news));
+      }
     });
   }
 

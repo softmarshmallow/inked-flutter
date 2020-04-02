@@ -1,29 +1,66 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:inked/data/model/news.dart';
-import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/model/news_receive.dart';
 import 'package:inked/data/remote/news_api.dart';
-import 'package:web_socket_channel/html.dart';
 import 'package:http/browser_client.dart' as http;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class RealtimeNewsReceiver {
   // region
   static final RealtimeNewsReceiver _singleton =
       RealtimeNewsReceiver._internal();
-
+  static NewsApi _api;
+  static IO.Socket _socket;
   factory RealtimeNewsReceiver() {
+    print("factory");
+     _api = NewsApi(Dio());
+     _initiallyLoadNews();
+     _listenSocketNewsEvents();
     return _singleton;
   }
 
+  static _initiallyLoadNews() async {
+    var recents = await _api.getLastNews();
+    recents.reversed.forEach((element) {
+      _controller.add(element);
+    });
+  }
+
+  static void _listenSocketNewsEvents(){
+    _socket = IO.io('http://13.209.232.176:3001/client', <String, dynamic>{
+//      'transports': ['websocket'],
+    });
+    _socket.on('connect', (_) {
+      print("socket io client connected");
+    });
+
+    _socket.on("news", (event) {
+//      print(event);
+      event = NewsReceiveEvent.fromJson({
+        "data": event["data"],
+        "type": event["type"]
+      });
+      _controller.add(event.data);
+    });
+  }
+
   RealtimeNewsReceiver._internal();
+
+
+  static StreamController<News> _controller = StreamController<News>();
+  Stream<News> steam(){
+    return _controller.stream;
+  }
 
   // endregion
   static const _interval = Duration(seconds: 5, milliseconds: 0);
   Stream<News> newsStream() async* {
     String lastNewsId;
     List<News> newRecents = [];
-    var api = NewsApi(Dio());
     while (true) {
-      var recents = await api.getLastNews();
+      var recents = await _api.getLastNews();
       if (lastNewsId == null) {
         newRecents = recents;
       } else{

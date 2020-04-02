@@ -42,6 +42,10 @@ NewsMeta _$NewsMetaFromJson(Map<String, dynamic> json) {
     ..crawledAt = json['crawledAt'] == null
         ? null
         : DateTime.parse(json['crawledAt'] as String)
+    ..spamMarks = (json['spamMarks'] as List)
+        ?.map((e) =>
+            e == null ? null : SpamMark.fromJson(e as Map<String, dynamic>))
+        ?.toList()
     ..summary = json['summary'] as String;
 }
 
@@ -53,5 +57,57 @@ Map<String, dynamic> _$NewsMetaToJson(NewsMeta instance) => <String, dynamic>{
       'categories': instance.categories,
       'category': instance.category,
       'crawledAt': instance.crawledAt?.toIso8601String(),
+      'spamMarks': instance.spamMarks,
       'summary': instance.summary,
     };
+
+SpamMark _$SpamMarkFromJson(Map<String, dynamic> json) {
+  return SpamMark()
+    ..at = json['at'] == null ? null : DateTime.parse(json['at'] as String)
+    ..spam = _$enumDecodeNullable(_$SpamTagEnumMap, json['spam'])
+    ..reason = json['reason'] as String;
+}
+
+Map<String, dynamic> _$SpamMarkToJson(SpamMark instance) => <String, dynamic>{
+      'at': instance.at?.toIso8601String(),
+      'spam': _$SpamTagEnumMap[instance.spam],
+      'reason': instance.reason,
+    };
+
+T _$enumDecode<T>(
+  Map<T, dynamic> enumValues,
+  dynamic source, {
+  T unknownValue,
+}) {
+  if (source == null) {
+    throw ArgumentError('A value must be provided. Supported values: '
+        '${enumValues.values.join(', ')}');
+  }
+
+  final value = enumValues.entries
+      .singleWhere((e) => e.value == source, orElse: () => null)
+      ?.key;
+
+  if (value == null && unknownValue == null) {
+    throw ArgumentError('`$source` is not one of the supported values: '
+        '${enumValues.values.join(', ')}');
+  }
+  return value ?? unknownValue;
+}
+
+T _$enumDecodeNullable<T>(
+  Map<T, dynamic> enumValues,
+  dynamic source, {
+  T unknownValue,
+}) {
+  if (source == null) {
+    return null;
+  }
+  return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
+}
+
+const _$SpamTagEnumMap = {
+  SpamTag.SPAM: 'SPAM',
+  SpamTag.NOTSPAM: 'NOTSPAM',
+  SpamTag.UNTAGGED: 'UNTAGGED',
+};

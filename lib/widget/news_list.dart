@@ -183,6 +183,23 @@ class NewsListItem extends StatelessWidget {
   Color _textColor = Colors.black;
 
   NewsListItem(this.data, {this.isFocused = false, this.actions, this.trail}){
+
+    // todo change logic later....
+    // if spam mark filter result
+    if (data.meta.spamMarks != null) {
+      data.meta.spamMarks.forEach((element) {
+        switch (element.spam){
+          case SpamTag.SPAM:
+            data.filterResult = FilterResult(true, action: FilterAction.Hide, filter: TokenFilter("server matching"));
+            break;
+          case SpamTag.NOTSPAM:
+            break;
+          case SpamTag.UNTAGGED:
+            break;
+        }
+      });
+    }
+
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       switch(data.filterResult.action){
@@ -247,7 +264,6 @@ class NewsListItem extends StatelessWidget {
   Widget _buildContentSection(BuildContext context) {
     var titleTextStyle = Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
     if (data.filterResult != null && data.filterResult.matched) {
-      print("${data.title} ${data.filterResult}");
       switch(data.filterResult.action){
         case FilterAction.Hide:
           titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(fontWeight: FontWeight.w300);

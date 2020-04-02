@@ -12,13 +12,15 @@ import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
 
 void main() {
+  print("started application..");
+  initFirebaseWeb();
   loadEnv();
-//  initFirebaseWeb();
   runApp(App());
 }
 
 Future<void> loadEnv() async {
   await DotEnv().load('.env');
+//  initFirebaseWeb();
 }
 
 initFirebaseWeb() {
@@ -26,15 +28,23 @@ initFirebaseWeb() {
 //  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
 //  final jsonResult = json.decode(data);
 //  var env = DotEnv().env;
-//  print(env["apiKey"]);
-//  if (apps.isEmpty) {
-//    initializeApp(
-//      apiKey: env['apiKey'],
-//      authDomain: env['authDomain'],
-//      databaseURL: env['databaseURL'],
-//      projectId: env['projectId'],
-//      storageBucket: env['storageBucket'],);
-//  }
+
+  const env = {
+    "apiKey": "AIzaSyBKTFm__PODFS5Yr3qrkWGLixXlnfyb6uo",
+    "authDomain": "inked-frontent.firebaseapp.com",
+    "databaseURL": "https://inked-frontent.firebaseio.com",
+    "projectId": "inked-frontent",
+    "storageBucket": "inked-frontent.appspot.com"
+  };
+  print(env["apiKey"]);
+  if (apps.isEmpty) {
+    initializeApp(
+      apiKey: env['apiKey'],
+      authDomain: env['authDomain'],
+      databaseURL: env['databaseURL'],
+      projectId: env['projectId'],
+      storageBucket: env['storageBucket'],);
+  }
 }
 
 class App extends StatelessWidget {

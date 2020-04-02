@@ -83,7 +83,7 @@ class SingleTokenFilterLayerProcessor implements IFilterProcessor{
     for (var contentToken in tokenizer.tokens){
       // if once matched, return anyway.
       if (matched == true){
-        print("matched = $matched // contentToken = $contentToken // layer.token = ${layer.token} // logic = ${layer.match} // content = $content");
+//        print("matched = $matched // contentToken = $contentToken // layer.token = ${layer.token} // logic = ${layer.match} // content = $content");
         return matched;
       }
       logic: switch(layer.match){
