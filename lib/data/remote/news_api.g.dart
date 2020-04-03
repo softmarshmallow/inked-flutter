@@ -58,7 +58,8 @@ class _NewsApi implements NewsApi {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    final Response<List<dynamic>> _result = await _dio.request('/news/$id',
+    final Response<Map<String, dynamic>> _result = await _dio.request(
+        '/news/$id',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'GET',
@@ -66,9 +67,7 @@ class _NewsApi implements NewsApi {
             extra: _extra,
             baseUrl: baseUrl),
         data: _data);
-    var value = _result.data
-        .map((dynamic i) => News.fromJson(i as Map<String, dynamic>))
-        .toList();
+    final value = News.fromJson(_result.data);
     return Future.value(value);
   }
 

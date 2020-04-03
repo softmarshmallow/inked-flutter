@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inked/data/model/filter.dart';
 
 abstract class IRepository<T> {
@@ -17,32 +17,32 @@ abstract class BaseFirestoreApi<T> implements IRepository<T> {
   final String path;
 
   Future<T> get(String id) async {
-    var res = await Firestore.instance
+   /* var res = await Firestore.instance
         .collection(path)
         .document(id)
         .snapshots()
         .first;
     var downloaded = fromJson(res.data);
     seedId(downloaded, res.documentID);
-    return downloaded;
+    return downloaded;*/
   }
 
   Future<T> create(T record) async {
-    var res = await Firestore.instance.collection(path).add(toJson(record));
+ /*   var res = await Firestore.instance.collection(path).add(toJson(record));
     var uploaded = await res.snapshots().first;
     var downloaded = fromJson(uploaded.data);
     seedId(downloaded, uploaded.documentID);
-    return downloaded;
+    return downloaded;*/
   }
 
   Future<List<T>> list();
 
   Future<T> update(String id, T record) async {
-    var res = await Firestore.instance
+/*    var res = await Firestore.instance
         .collection(path)
         .document(id)
         .updateData(toJson(record));
-    return record;
+    return record;*/
   }
 
   T fromJson(Map<String, dynamic> map);
@@ -57,9 +57,9 @@ class TokenFilterFirestoreApi extends BaseFirestoreApi<TokenFilter> {
 
   @override
   Future<List<TokenFilter>> list() async {
-    var res = await Firestore.instance.collection(path).snapshots().first;
+  /*  var res = await Firestore.instance.collection(path).snapshots().first;
     print(res);
-    return [];
+    return [];*/
     // todo
   }
 

@@ -14,8 +14,10 @@ class Elasticsearch {
     dio = new Dio(options);
   }
 
-  Future<List<NewsDocumentResult>> searchMultiMatch(String term,
-      {int size = 20, int from = 0}) async {
+  Future<SearchResponse<NewsDocumentResult>> searchMultiMatch(String term,
+      {int size = 20, int page = 1}) async {
+
+    int from = (page-1) * size;
     try {
       var q = {
         "query": {
@@ -54,6 +56,10 @@ class Elasticsearch {
 
       Response response = await dio.post("/news/_search", data: q);
       var hitsObj = response.data["hits"];
+      var maxScore = hitsObj["max_score"];
+      var took = response.data["took"];
+      var timedOut = response.data["timed_out"];
+      var totalHistCount = hitsObj["total"]["value"];
       var hitsArray = hitsObj["hits"];
       List<NewsDocumentResult> res = [];
       for (var h in hitsArray) {
@@ -61,10 +67,10 @@ class Elasticsearch {
         docRes.source.id = docRes.id;
         res.add(docRes);
       }
-      return res;
+      return SearchResponse<NewsDocumentResult>(maxScore: maxScore, took: took, total: totalHistCount, timedOut: timedOut, documents: res);
     } catch (e) {
       print(e);
-      return [];
+      return null;
     }
   }
 }

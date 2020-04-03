@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/remote/firebase_api.dart';

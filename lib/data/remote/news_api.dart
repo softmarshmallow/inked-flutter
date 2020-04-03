@@ -15,7 +15,7 @@ abstract class NewsApi {
   Future<List<News>> getNews();
 
   @GET("/news/{id}")
-  Future<List<News>> getNewsItem(@Path("id") String id);
+  Future<News> getNewsItem(@Path("id") String id);
 
   @GET("/news/recent")
   Future<List<News>> getLastNews(

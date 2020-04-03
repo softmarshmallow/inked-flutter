@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/model/news_receive.dart';
 import 'package:inked/data/remote/news_api.dart';
-import 'package:http/browser_client.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class RealtimeNewsReceiver {

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:inked/data/model/news.dart';
+import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
 import 'package:inked/utils/elasticsearch/elasticsearch.dart';
 import 'package:inked/utils/elasticsearch/model.dart';
@@ -18,54 +20,129 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String _term;
-  List<NewsDocumentResult> searchResults = [];
+  SearchResponse<NewsDocumentResult> searchResults;
   bool _loading = false;
+  int page = 1;
+  final ScrollController _scrollController = ScrollController();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text("search"),
-          actions: <Widget>[
-            SizedBox(
-              width: 300,
-              height: 150,
-              child: TextField(
-                  autofocus: true,
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Enter a search term'),
-                onChanged: (s) {
-                  setState(() {
-                    _term = s;
-                  });
-                },
-                onSubmitted: (s) {
-                  _search();
-                },
-              ),
-            )
-          ],
           bottom: _loading ? AppbarLinearProgressIndicator(
             backgroundColor: Colors.black,
           ) : null,
         ),
         body: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             children: <Widget>[
-              searchResults.length > 0 ? ListView.builder(
-                  itemBuilder: (c, i) {
-                    var d = searchResults[i];
-                    return NewsListItem(d.source,
-                        timeFormatType: TimeFormatType.THIS_MONTH,
-                        bottom: _buildContentSnippetSection(d));
-                  },
-                  itemCount: searchResults.length,
-                  shrinkWrap: true) : Text("no result for search term: $_term")
+              _buildSearchInput(),
+              _buildSearchResultMeta(),
+              _buildList(),
+              _buildPagination()
             ],
           ),
         ));
+  }
+
+  Widget _buildSearchResultMeta() {
+    var child;
+    if (searchResults == null) {
+      child = Text("no result for search term: $_term");
+    }else{
+      child = Text("page: ${page} total : ${searchResults.total} took: ${searchResults.took/100} seconds, maxScore: ${searchResults.maxScore}");
+    }
+    return Container(child: child, padding: EdgeInsets.all(16),);
+  }
+
+  Widget _buildList() {
+    if (searchResults != null && searchResults.documents.length > 0) {
+      return ListView.builder(
+          itemBuilder: (c, i) {
+            var d = searchResults.documents[i];
+            return Container(
+              padding: EdgeInsets.only(top: 24),
+              child: NewsListItem(d.source,
+                  timeFormatType: TimeFormatType.THIS_MONTH,
+                  actions: NewsListItemActions(_onItemTap),
+                  bottom: _buildContentSnippetSection(d)),
+            );
+          },
+          itemCount: searchResults.documents.length,
+          shrinkWrap: true);
+    }
+    return SizedBox.shrink();
+  }
+
+  _onItemTap(News n){
+    Navigator.of(context).pushNamed(ContentDetailScreen.routeName, arguments: n);
+  }
+
+  Widget _buildPagination(){
+    changePage(int to){
+      if (to > 0){
+        setState(() {
+          page = to;
+        });
+      }
+      _scrollController.jumpTo(0);
+      _search();
+    }
+    return Row(
+      children: <Widget>[
+        IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
+          changePage(page - 1);
+        },),
+        Text("$page"),
+        IconButton(icon: Icon(Icons.arrow_forward), onPressed: (){
+          changePage(page + 1);
+        },),
+      ],
+    );
+  }
+
+  Widget _buildSearchInput() {
+    return Container(
+      padding: EdgeInsets.all(24),
+      width: MediaQuery.of(context).size.width,
+      child: TextField(
+        autofocus: true,
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            border: InputBorder.none,
+            hintText: 'Enter a search term'),
+        onChanged: (s) {
+          setState(() {
+            _term = s;
+          });
+        },
+        onSubmitted: (s) {
+          _search();
+        },
+      ),
+    );
+  }
+
+  String duration = "now-1d";
+  List<String> durations = ["now-1d", "now-1h", "now-1w"];
+
+  Widget _buildDurationPicker() {
+    return DropdownButton(
+      value: duration,
+      onChanged: (String value) {
+        setState(() {
+          duration = value;
+        });
+      },
+      items: durations.map((String action) {
+        return DropdownMenuItem<String>(
+            value: action, child: Text(action.toString()));
+      }).toList(),
+    );
   }
 
   Widget _buildContentSnippetSection(NewsDocumentResult result) {
@@ -76,7 +153,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (combined.isNotEmpty) {
       return buildTextFromEm(combined,
-          Theme.of(context).textTheme.caption.copyWith(color: Colors.red));
+          Theme
+              .of(context)
+              .textTheme
+              .caption
+              .copyWith(color: Colors.red));
     }
     return SizedBox.shrink();
   }
@@ -88,7 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
       _loading = true;
     });
 
-    searchResults = await Elasticsearch(esHost).searchMultiMatch(_term);
+    searchResults = await Elasticsearch(esHost).searchMultiMatch(_term, page: page);
     setState(() {
       _loading = false;
       searchResults = searchResults;

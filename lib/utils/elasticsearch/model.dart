@@ -44,3 +44,12 @@ class NewsHighlights{
 
   Map<String, dynamic> toJson() => _$NewsHighlightsToJson(this);
 }
+
+class SearchResponse<T>{
+  SearchResponse({this.took, this.timedOut, this.total, this.maxScore, this.documents});
+  num took;
+  bool timedOut;
+  num total;
+  num maxScore;
+  List<T> documents;
+}
