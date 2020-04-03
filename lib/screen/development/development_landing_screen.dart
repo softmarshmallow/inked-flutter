@@ -29,7 +29,9 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
                 AudioPlayer audioPlayer = AudioPlayer();
                 var res = await audioPlayer.play(
                     "https://freesound.org/data/previews/147/147597_2173181-lq.mp3");
-                var eres = await audioPlayer.play("beep.mp3", isLocal: true);
+                print(res);
+//                var eres = await audioPlayer.play("assets/beep.mp3", isLocal: true);
+//                print(eres);
               },
             ),
             ListTile(

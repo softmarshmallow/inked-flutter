@@ -13,7 +13,6 @@ class RealtimeNewsReceiver {
   static NewsApi _api;
   static IO.Socket _socket;
   factory RealtimeNewsReceiver() {
-    print("factory");
      _api = NewsApi(Dio());
      _initiallyLoadNews();
      _listenSocketNewsEvents();
@@ -29,7 +28,7 @@ class RealtimeNewsReceiver {
 
   static void _listenSocketNewsEvents(){
     _socket = IO.io('http://13.209.232.176:3001/client', <String, dynamic>{
-//      'transports': ['websocket'],
+      'transports': ['websocket'],
     });
     _socket.on('connect', (_) {
       print("socket io client connected");

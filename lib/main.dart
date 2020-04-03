@@ -8,8 +8,12 @@ import 'package:inked/utils/routes.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
-
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 void main() {
+  // See https://github.com/flutter/flutter/wiki/Desktop-shells#target-platform-override
+  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+
   print("started application..");
   initFirebaseWeb();
   loadEnv();

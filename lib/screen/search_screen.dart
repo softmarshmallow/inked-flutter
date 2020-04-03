@@ -25,37 +25,44 @@ class _SearchScreenState extends State<SearchScreen> {
   int page = 1;
   final ScrollController _scrollController = ScrollController();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text("search"),
-          bottom: _loading ? AppbarLinearProgressIndicator(
-            backgroundColor: Colors.black,
-          ) : null,
+          bottom: _loading
+              ? AppbarLinearProgressIndicator(
+                  backgroundColor: Colors.black,
+                )
+              : null,
         ),
-        body: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: <Widget>[
-              _buildSearchInput(),
-              _buildSearchResultMeta(),
-              _buildList(),
-              _buildPagination()
-            ],
-          ),
-        ));
+        body: Scrollbar(
+            controller: _scrollController,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: <Widget>[
+                  _buildSearchInput(),
+                  _buildSearchResultMeta(),
+                  _buildList(),
+                  _buildPagination()
+                ],
+              ),
+            )));
   }
 
   Widget _buildSearchResultMeta() {
     var child;
     if (searchResults == null) {
       child = Text("no result for search term: $_term");
-    }else{
-      child = Text("page: ${page} total : ${searchResults.total} took: ${searchResults.took/100} seconds, maxScore: ${searchResults.maxScore}");
+    } else {
+      child = Text(
+          "page: ${page} total : ${searchResults.total} took: ${searchResults.took / 100} seconds, maxScore: ${searchResults.maxScore}");
     }
-    return Container(child: child, padding: EdgeInsets.all(16),);
+    return Container(
+      child: child,
+      padding: EdgeInsets.all(16),
+    );
   }
 
   Widget _buildList() {
@@ -77,13 +84,14 @@ class _SearchScreenState extends State<SearchScreen> {
     return SizedBox.shrink();
   }
 
-  _onItemTap(News n){
-    Navigator.of(context).pushNamed(ContentDetailScreen.routeName, arguments: n);
+  _onItemTap(News n) {
+    Navigator.of(context)
+        .pushNamed(ContentDetailScreen.routeName, arguments: n);
   }
 
-  Widget _buildPagination(){
-    changePage(int to){
-      if (to > 0){
+  Widget _buildPagination() {
+    changePage(int to) {
+      if (to > 0) {
         setState(() {
           page = to;
         });
@@ -91,15 +99,22 @@ class _SearchScreenState extends State<SearchScreen> {
       _scrollController.jumpTo(0);
       _search();
     }
+
     return Row(
       children: <Widget>[
-        IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
-          changePage(page - 1);
-        },),
+        IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            changePage(page - 1);
+          },
+        ),
         Text("$page"),
-        IconButton(icon: Icon(Icons.arrow_forward), onPressed: (){
-          changePage(page + 1);
-        },),
+        IconButton(
+          icon: Icon(Icons.arrow_forward),
+          onPressed: () {
+            changePage(page + 1);
+          },
+        ),
       ],
     );
   }
@@ -153,11 +168,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (combined.isNotEmpty) {
       return buildTextFromEm(combined,
-          Theme
-              .of(context)
-              .textTheme
-              .caption
-              .copyWith(color: Colors.red));
+          Theme.of(context).textTheme.caption.copyWith(color: Colors.red));
     }
     return SizedBox.shrink();
   }
@@ -169,7 +180,8 @@ class _SearchScreenState extends State<SearchScreen> {
       _loading = true;
     });
 
-    searchResults = await Elasticsearch(esHost).searchMultiMatch(_term, page: page);
+    searchResults =
+        await Elasticsearch(esHost).searchMultiMatch(_term, page: page);
     setState(() {
       _loading = false;
       searchResults = searchResults;
