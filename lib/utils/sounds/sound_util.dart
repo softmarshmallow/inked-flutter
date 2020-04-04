@@ -5,6 +5,7 @@ AudioPlayer audioPlayer = AudioPlayer();
 const List<String> _played = [];
 playOnceInLifetime(String id, String file) async {
   if (!_played.contains(id)) {
+    _played.add(id);
     await audioPlayer.play(file);
   }
 }
