@@ -5,14 +5,14 @@ class MockFilterDatabase extends BaseMockDatabase<TokenFilter>{
 
 //  static var spams
 
-  static var photoFilter = TokenFilter("dont show if photo", action: FilterAction.Hide, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
+  static var photoFilter = TokenFilter("dont show if photo", action: FilterAction.HIDE, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
     SingleTokenFilterLayer(token: "사진", scope: FilterScope.Title, match: FilterMatchType.Contains),
     SingleTokenFilterLayer(token: "포토", scope: FilterScope.Title, match: FilterMatchType.Contains),
 //    SingleTokenFilterLayer(token: "<img", scope: FilterScope.Body, match: FilterMatchType.Contains),
   ]);
 
 
-  static var paperNewsFilter = TokenFilter("dont show paper news", action: FilterAction.Hide, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
+  static var paperNewsFilter = TokenFilter("dont show paper news", action: FilterAction.HIDE, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
       SingleTokenFilterLayer(token: "[앵커]", scope: FilterScope.Body, match: FilterMatchType.Contains),
       SingleTokenFilterLayer(token: "[기자]", scope: FilterScope.Body, match: FilterMatchType.Contains),
       SingleTokenFilterLayer(token: "<video", scope: FilterScope.Body, match: FilterMatchType.Contains),
@@ -20,7 +20,7 @@ class MockFilterDatabase extends BaseMockDatabase<TokenFilter>{
     SingleTokenFilterLayer(token: "동영상 뉴스", scope: FilterScope.Body, match: FilterMatchType.Contains),
   ]);
 
-  static var miscSpamFilter = TokenFilter("dont show if misc spam", action: FilterAction.Hide, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
+  static var miscSpamFilter = TokenFilter("dont show if misc spam", action: FilterAction.HIDE, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [
     SingleTokenFilterLayer(token: "날씨", scope: FilterScope.Title, match: FilterMatchType.Contains),
     SingleTokenFilterLayer(token: "기고", scope: FilterScope.Title, match: FilterMatchType.Contains),
 
@@ -303,7 +303,7 @@ class MockFilterDatabase extends BaseMockDatabase<TokenFilter>{
 
   ]);
 
-  static var mainFilter = TokenFilter("default spam removal", action: FilterAction.Hide, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [], extraFilters: [
+  static var mainFilter = TokenFilter("default spam removal", action: FilterAction.HIDE, operation: OperationType.Or, isRootFilter: true, isOn: true, filterLayers: [], extraFilters: [
     photoFilter,
     paperNewsFilter,
     miscSpamFilter,

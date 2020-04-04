@@ -9,6 +9,8 @@ import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/data/repository/news_repository.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
+import 'package:inked/utils/elasticsearch/model.dart';
+import 'package:inked/utils/text_highlight/highlighted_text.dart';
 import 'package:inked/utils/url_launch.dart';
 import 'package:intl/intl.dart';
 
@@ -142,7 +144,7 @@ class NewsListView extends StatelessWidget {
                     actions: defaultItemAction,
                     trail: data.filterResult != null &&
                             data.filterResult.matched &&
-                            data.filterResult.action == FilterAction.Hide
+                            data.filterResult.action == FilterAction.HIDE
                         ? []
                         : <Widget>[
                             IconButton(
@@ -197,35 +199,23 @@ class NewsListItem extends StatelessWidget {
       this.actions,
       this.trail,
       this.timeFormatType = TimeFormatType.TODAY}) {
-    // todo change logic later....
-    // if spam mark filter result
-    if (data.meta.spamMarks != null) {
-      data.meta.spamMarks.forEach((element) {
-        switch (element.spam) {
-          case SpamTag.SPAM:
-            data.filterResult = FilterResult(true,
-                action: FilterAction.Hide,
-                filter: TokenFilter("server matching"));
-            break;
-          case SpamTag.NOTSPAM:
-            break;
-          case SpamTag.UNTAGGED:
-            break;
-        }
-      });
-    }
-
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       switch (data.filterResult.action) {
-        case FilterAction.Hide:
+        case FilterAction.HIDE:
           _textColor = Colors.black45;
           break;
-        case FilterAction.Notify:
-          _textColor = Colors.red;
+        case FilterAction.NOTIFY:
+          _textColor = Colors.blueAccent;
           break;
-        case FilterAction.None:
+        case FilterAction.IGNORE:
           _textColor = Colors.black;
+          break;
+        case FilterAction.HIGHLIGHT:
+          _textColor = Colors.blueAccent;
+          break;
+        case FilterAction.ALERT:
+          _textColor = Colors.redAccent;
           break;
       }
     }
@@ -281,14 +271,34 @@ class NewsListItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                _buildBottom(),
+                _buildBottom(context),
               ],
             )));
   }
 
-  Widget _buildBottom() {
+  Widget _buildBottom(BuildContext context) {
     if (this.bottom != null) {
       return this.bottom;
+    } else {
+      // show default bottom
+      try {
+        return _buildContentSnippetSection(
+            context, data.filterResult.highlights);
+      } catch (e) {}
+    }
+    return SizedBox.shrink();
+  }
+
+  Widget _buildContentSnippetSection(
+      BuildContext context, NewsHighlights highlights) {
+    String combined = "";
+    highlights?.content?.forEach((element) {
+      combined += element + "\n___\n";
+    });
+
+    if (combined.isNotEmpty) {
+      return buildTextFromEm(combined,
+          Theme.of(context).textTheme.caption.copyWith(color: Colors.red));
     }
     return SizedBox.shrink();
   }
@@ -298,18 +308,26 @@ class NewsListItem extends StatelessWidget {
         Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
     if (data.filterResult != null && data.filterResult.matched) {
       switch (data.filterResult.action) {
-        case FilterAction.Hide:
+        case FilterAction.HIDE:
           titleTextStyle = Theme.of(context)
               .textTheme
               .subtitle2
               .copyWith(fontWeight: FontWeight.w300);
           break;
-        case FilterAction.Notify:
+        case FilterAction.NOTIFY:
           titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.bold);
           break;
-        case FilterAction.None:
+        case FilterAction.IGNORE:
           titleTextStyle =
               titleTextStyle.copyWith(fontWeight: FontWeight.normal);
+          break;
+        case FilterAction.HIGHLIGHT:
+          titleTextStyle = titleTextStyle.copyWith(
+              fontWeight: FontWeight.bold, color: Colors.blueAccent);
+          break;
+        case FilterAction.ALERT:
+          titleTextStyle = titleTextStyle.copyWith(
+              fontWeight: FontWeight.bold, color: Colors.red);
           break;
       }
     }
@@ -325,13 +343,13 @@ class NewsListItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: titleTextStyle,
             ),
-            _buildContentSnippetSection(context)
+            _buildMetaSnippetSection(context)
           ],
         ));
   }
 
   // content snippet section that holds (chips, summary, ect...)
-  Widget _buildContentSnippetSection(BuildContext context) {
+  Widget _buildMetaSnippetSection(BuildContext context) {
     if (data.tags != null && data.tags.length > 0) {
       return SizedBox(
           height: 48,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
@@ -70,12 +71,16 @@ class _SearchScreenState extends State<SearchScreen> {
       return ListView.builder(
           itemBuilder: (c, i) {
             var d = searchResults.documents[i];
+
+            // todo change this location
+            d.source.filterResult = NewsFilterResult(true, action: FilterAction.HIGHLIGHT, highlights: d.highlight);
+
             return Container(
               padding: EdgeInsets.only(top: 24),
               child: NewsListItem(d.source,
                   timeFormatType: TimeFormatType.THIS_MONTH,
                   actions: NewsListItemActions(_onItemTap),
-                  bottom: _buildContentSnippetSection(d)),
+              ),
             );
           },
           itemCount: searchResults.documents.length,
@@ -160,18 +165,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildContentSnippetSection(NewsDocumentResult result) {
-    String combined = "";
-    result?.highlight?.content?.forEach((element) {
-      combined += element + "\n___\n";
-    });
-
-    if (combined.isNotEmpty) {
-      return buildTextFromEm(combined,
-          Theme.of(context).textTheme.caption.copyWith(color: Colors.red));
-    }
-    return SizedBox.shrink();
-  }
 
   _search() async {
     var esHost = DotEnv().env["ES_HOST"];

@@ -1,6 +1,6 @@
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
-import 'package:inked/utils/tokenizer.dart';
+import 'package:inked/utils/filters/tokenizer.dart';
 
 abstract class IFilterProcessor{
   bool process();

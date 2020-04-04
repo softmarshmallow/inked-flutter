@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:inked/data/model/base.dart';
+import 'package:inked/utils/elasticsearch/model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'filter.g.dart';
@@ -19,7 +20,7 @@ class TokenFilter extends NewsFilter implements IFirebaseModel{
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
   String name = "untitled";
-  FilterAction action = FilterAction.Notify;
+  FilterAction action = FilterAction.NOTIFY;
   List<SingleTokenFilterLayer> filterLayers = [];
 
   List<TokenFilter> extraFilters = [];
@@ -53,13 +54,24 @@ class SingleTokenFilterLayer implements IFirebaseModel{
 }
 
 
+@JsonSerializable()
 class TermsFilter extends NewsFilter{
-  TermsFilter(this.terms, {this.name, @required this.action});
+  TermsFilter(this.terms, {@required this.action});
+  @JsonKey(ignore: true)
   @override
-  String name;
+  String get name => this.terms;
+
+  @JsonKey(name: "id")
+  String id;
+  @JsonKey(name: "action")
   @override
-  FilterAction action = FilterAction.Notify;
+  FilterAction action = FilterAction.NOTIFY;
+  @JsonKey(name: "terms")
   String terms;
+
+
+  factory TermsFilter.fromJson(Map<String, dynamic> json) => _$TermsFilterFromJson(json);
+  Map<String, dynamic> toJson() => _$TermsFilterToJson(this);
 }
 
 enum OperationType{
@@ -76,9 +88,11 @@ enum FilterMatchType{
 
 
 enum FilterAction{
-  Hide,
-  Notify,
-  None
+  HIDE,
+  NOTIFY,
+  IGNORE,
+  HIGHLIGHT,
+  ALERT
 }
 
 enum FilterScope{
@@ -86,12 +100,12 @@ enum FilterScope{
   Body
 }
 
-class FilterResult{
-  FilterResult(this.matched, {this.action, this.filter});
+class NewsFilterResult{
+  NewsFilterResult(this.matched, {this.action, this.highlights});
   final bool matched;
   final FilterAction action;
-  final NewsFilter filter;
+  final NewsHighlights highlights;
 
   @override
-  String toString() => "filter >> ${filter.name} matched >> $matched action >> $action";
+  String toString() => "matched >> $matched action >> $action";
 }

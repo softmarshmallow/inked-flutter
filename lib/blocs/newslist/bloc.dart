@@ -5,7 +5,7 @@ import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/realtime_news_receiver.dart';
 import 'package:inked/data/repository/news_repository.dart';
-import 'package:inked/utils/token_filter_processor.dart';
+import 'package:inked/utils/filters/token_filter_processor.dart';
 
 abstract class NewsListEvent extends Equatable {
   const NewsListEvent();
@@ -45,10 +45,10 @@ class NoFocusState extends NewsListState {
 }
 
 class FocusedState extends NewsListState {
-  FocusedState(News news) : super(news, NewsRepository.NEWS_LIST);
+  FocusedState(News news) : super(news, NewsRepository().DATA);
 }
 
-class FocusedStillState extends FocusedState{
+class FocusedStillState extends FocusedState {
   FocusedStillState(News news, this.newNews) : super(news);
   final News newNews;
 
@@ -57,7 +57,7 @@ class FocusedStillState extends FocusedState{
 }
 
 class TopFocusState extends NewsListState {
-  TopFocusState(News news) : super(news, NewsRepository.NEWS_LIST);
+  TopFocusState(News news) : super(news, NewsRepository().DATA);
 }
 
 class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
@@ -66,11 +66,12 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
 
   NewsItemFocusType _focusType = NewsItemFocusType.TopFocus;
   News _focusedNews;
+  NewsRepository repository = NewsRepository();
 
   NewsListBloc() {
     RealtimeNewsReceiver().steam().listen((news) {
 //      _runFilters(news);
-      var isAdded = NewsRepository.addNews(news);
+      var isAdded = repository.add(news);
       if (isAdded) {
         add(NewNewsEvent(news));
       }
@@ -78,12 +79,6 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
   }
 
   List<NewsFilter> filters = [MockFilterDatabase.mainFilter];
-  _runFilters(News news){
-    var filter = filters.first;
-    var processor = TokenFilterProcessor(news, filter);
-    var res = processor.process();
-    news.filterResult = FilterResult(res, filter: filter, action: filter.action);
-  }
 
   @override
   Stream<NewsListState> mapEventToState(NewsListEvent event) async* {
@@ -100,13 +95,13 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
           yield NoFocusState();
           break;
         case NewsItemFocusType.TopFocus:
-          _focusedNews = NewsRepository.latestNews;
+          _focusedNews = repository.latestNews;
           yield TopFocusState(_focusedNews);
           break;
       }
     } else if (event is TopFocusEvent) {
       _focusType = NewsItemFocusType.TopFocus;
-      _focusedNews = NewsRepository.latestNews;
+      _focusedNews = repository.latestNews;
       yield TopFocusState(_focusedNews);
     }
   }

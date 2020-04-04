@@ -69,9 +69,11 @@ T _$enumDecodeNullable<T>(
 }
 
 const _$FilterActionEnumMap = {
-  FilterAction.Hide: 'Hide',
-  FilterAction.Notify: 'Notify',
-  FilterAction.None: 'None',
+  FilterAction.HIDE: 'HIDE',
+  FilterAction.NOTIFY: 'NOTIFY',
+  FilterAction.IGNORE: 'IGNORE',
+  FilterAction.HIGHLIGHT: 'HIGHLIGHT',
+  FilterAction.ALERT: 'ALERT',
 };
 
 const _$OperationTypeEnumMap = {
@@ -107,3 +109,17 @@ const _$FilterMatchTypeEnumMap = {
   FilterMatchType.NotContains: 'NotContains',
   FilterMatchType.NotMatches: 'NotMatches',
 };
+
+TermsFilter _$TermsFilterFromJson(Map<String, dynamic> json) {
+  return TermsFilter(
+    json['terms'] as String,
+    action: _$enumDecodeNullable(_$FilterActionEnumMap, json['action']),
+  )..id = json['id'] as String;
+}
+
+Map<String, dynamic> _$TermsFilterToJson(TermsFilter instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'action': _$FilterActionEnumMap[instance.action],
+      'terms': instance.terms,
+    };

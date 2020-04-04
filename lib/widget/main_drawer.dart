@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/filters/filter_settings_screen.dart';
+import 'package:inked/screen/filters/filter_terms_screen.dart';
 import 'package:inked/screen/filters/filter_testing_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/search_screen.dart';
@@ -22,7 +23,7 @@ Widget buildMainDrawer(BuildContext context) {
           leading: Icon(Icons.filter_list),
           title: Text('filter'),
           onTap: () {
-            Navigator.of(context).pushNamed(FilterSettingsScreen.routeName);
+            Navigator.of(context).pushNamed(TermsFilterScreen.routeName);
           },
         ),
         ListTile(

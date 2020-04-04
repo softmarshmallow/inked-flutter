@@ -1,45 +1,74 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/data/repository/base.dart';
+import 'package:inked/data/repository/news_filter_repositry.dart';
 import 'package:inked/utils/constants.dart';
 import 'package:inked/utils/elasticsearch/elasticsearch.dart';
+import 'package:inked/utils/filters/terms_filter_processor.dart';
 
 const MAX_NEWS_MEMORY_COUNT = 1000;
 
-class NewsRepository {
-  static List<News> NEWS_LIST = [];
+class NewsRepository extends BaseRepository<News> {
+  // region singleton
+  static final NewsRepository _singleton = NewsRepository._internal();
 
-  static bool addNews(News newsItem) {
+  factory NewsRepository() {
+    return _singleton;
+  }
+
+  NewsRepository._internal();
+
+  // endregion
+
+  bool add(News newsItem) {
     try {
-      var conflictIndex = NEWS_LIST.indexWhere((element) =>
-      element.id == newsItem.id);
-      NEWS_LIST.removeAt(conflictIndex);
-      NEWS_LIST.insert(conflictIndex, newsItem);
+      var conflictIndex =
+          DATA.indexWhere((element) => element.id == newsItem.id);
+      DATA.removeAt(conflictIndex);
+      DATA.insert(conflictIndex, newsItem);
       return true;
     } catch (e) {}
 
-    NEWS_LIST.insert(0, newsItem);
+    DATA.insert(0, newsItem);
     onAdd(newsItem);
-    if (NEWS_LIST.length > MAX_NEWS_MEMORY_COUNT) {
-      NEWS_LIST.removeRange(0, NEWS_LIST.length - MAX_NEWS_MEMORY_COUNT);
+    if (DATA.length > MAX_NEWS_MEMORY_COUNT) {
+      DATA.removeRange(0, DATA.length - MAX_NEWS_MEMORY_COUNT);
     }
     print('new item has added to repository : $newsItem');
     return true;
   }
 
+  @override
+  set(List<News> data) {
+    // TODO: implement set
+    throw UnimplementedError();
+  }
 
-  static onAdd(News news) async {
-    var host =  DotEnv().env["ES_HOST"];
-    var es = Elasticsearch(host.toString());
-    var res = await es.documentMatches(news.id, "속보");
-    print(res);
-    if (res) {
-      AudioPlayer audioPlayer = AudioPlayer();
-      var res = await audioPlayer.play(
-          SOUND_TONE_2_URL);
-      print(res);
+  NewsFilterRepository newsFilterRepository = NewsFilterRepository();
+
+  onAdd(News news) async {
+    // convert meta spam to spam
+    if (news.meta.spamMarks != null) {
+      news.meta.spamMarks.forEach((element) {
+        if (element.spam == SpamTag.SPAM) {
+          news.filterResult = NewsFilterResult(
+            true,
+            action: FilterAction.HIDE,
+          );
+        }
+      });
+    }
+
+    var processor = TermsFilterProcessor(news, newsFilterRepository.DATA);
+    await processor.process();
+    if (processor.highestMatched != null){
+      news.filterResult = processor.highestMatched;
+      // make news update from ui
+      // processor.highestMatched.action -> perform action
     }
   }
 
-  static get latestNews => NEWS_LIST.first;
+  get latestNews => DATA.first;
 }

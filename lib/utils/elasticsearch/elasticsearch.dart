@@ -24,9 +24,9 @@ class Elasticsearch {
           "bool": {
             "must": [
               {
-                "multi_match": {
+                "simple_query_string": {
                   "query": term,
-                  "fields": ["content", "title"]
+                  "fields": ["title", "content"]
                 }
               }
             ],
@@ -48,7 +48,7 @@ class Elasticsearch {
           }
         },
         "highlight": {
-          "fields": {"content": {}}
+          "fields": {"content": {}, "title": {}}
         },
         "size": size,
         "from": from
@@ -87,9 +87,9 @@ class Elasticsearch {
         "bool": {
           "must": [
             {
-              "multi_match": {
+              "simple_query_string": {
                 "query": term,
-                "fields": ["content", "title"]
+                "fields": ["title", "content"]
               }
             }
           ],
@@ -99,7 +99,10 @@ class Elasticsearch {
             }
           }
         }
-      }
+      },
+      "highlight": {
+        "fields": {"content": {}, "title": {}}
+      },
     };
     Response response = await dio.post("/news/_search", data: q);
     var searchRes = buildSearchResponse(response.data);
@@ -114,18 +117,29 @@ class Elasticsearch {
     return searchRes;
   }
 
-  Future<bool> documentMatches(String doc, String term) async {
-    try{
+  Future<SearchResponse<NewsDocumentResult>> documentMatches(String doc, String term) async {
+    try {
+      await new Future.delayed(const Duration(seconds : 1));
+      var exists = await documentExists(doc);
+      if (!exists) {
+        print("document is not ready to search $doc");
+        return null;
+      }
       var res = await searchInSingleDocument(doc, term);
-      return res.documents.length > 0;
-    }catch(e){
-      return false;
+      var matched = res.documents.length > 0;
+      print("doc: $doc matched: $matched for score ${res.maxScore}for term: $term");
+      if (matched) {
+        return res;
+      }  else{
+        return null;
+      }
+    } catch (e) {
+      return null;
     }
   }
 }
 
-
-SearchResponse buildSearchResponse(dynamic data){
+SearchResponse buildSearchResponse(dynamic data) {
   var hitsObj = data["hits"];
   var maxScore = hitsObj["max_score"];
   var took = data["took"];
@@ -133,14 +147,12 @@ SearchResponse buildSearchResponse(dynamic data){
   var totalHistCount = hitsObj["total"]["value"];
 
   return SearchResponse<NewsDocumentResult>(
-      maxScore: maxScore,
-      took: took,
-      total: totalHistCount,
-      timedOut: timedOut,);
+    maxScore: maxScore,
+    took: took,
+    total: totalHistCount,
+    timedOut: timedOut,
+  );
 }
-
-
-
 
 /*
 * {

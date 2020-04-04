@@ -15,7 +15,7 @@ class _FilterCreateScreenState extends State<FilterCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   TokenFilter filter = new TokenFilter("untitled",
-      action: FilterAction.Hide, isOn: true, isRootFilter: true, filterLayers: []);
+      action: FilterAction.HIDE, isOn: true, isRootFilter: true, filterLayers: []);
 
   @override
   Widget build(BuildContext context) {

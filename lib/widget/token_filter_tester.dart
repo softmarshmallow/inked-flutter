@@ -5,7 +5,7 @@ import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/dialogs/enter_custom_news.dart';
-import 'package:inked/utils/token_filter_processor.dart';
+import 'package:inked/utils/filters/token_filter_processor.dart';
 import 'package:inked/widget/content_detail.dart';
 
 class TokenFilterTester extends StatefulWidget {

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/blocs/newslist/bloc.dart';
 import 'package:inked/dialogs/search_dialog.dart';
+import 'package:inked/screen/splash/splash.dart';
 import 'package:inked/utils/routes.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
@@ -15,39 +16,9 @@ void main() {
   debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
 
   print("started application..");
-  initFirebaseWeb();
-  loadEnv();
   runApp(App());
 }
 
-Future<void> loadEnv() async {
-  await DotEnv().load('.env');
-//  initFirebaseWeb();
-}
-
-initFirebaseWeb() {
-  // FIXME does not work via dart, works in html script -> https://github.com/FirebaseExtended/flutterfire/issues/2204
-//  String data = await DefaultAssetBundle.of(context).loadString("assets/firebase.json");
-//  final jsonResult = json.decode(data);
-//  var env = DotEnv().env;
-
-  const env = {
-    "apiKey": "AIzaSyBKTFm__PODFS5Yr3qrkWGLixXlnfyb6uo",
-    "authDomain": "inked-frontent.firebaseapp.com",
-    "databaseURL": "https://inked-frontent.firebaseio.com",
-    "projectId": "inked-frontent",
-    "storageBucket": "inked-frontent.appspot.com"
-  };
-  print(env["apiKey"]);
-/*  if (apps.isEmpty) {
-    initializeApp(
-      apiKey: env['apiKey'],
-      authDomain: env['authDomain'],
-      databaseURL: env['databaseURL'],
-      projectId: env['projectId'],
-      storageBucket: env['storageBucket'],);
-  }*/
-}
 
 class App extends StatelessWidget {
   // This widget is the root of your application.
@@ -60,10 +31,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.yellow,
       ),
       routes: buildRoutes(context),
-      home: BlocProvider(
-        create: (context) => NewsListBloc(),
-        child: HomeScreen(title: 'Inked'),
-      ),
+      home: Splash()
     );
   }
 }

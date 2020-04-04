@@ -10,9 +10,11 @@ import 'package:inked/screen/filters/filter_testing_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
+import 'package:inked/screen/splash/splash.dart';
 
 Map<String, WidgetBuilder> buildRoutes(BuildContext context){
   return {
+    Splash.routeName: (context) => Splash(),
     ContentDetailScreen.routeName: (context) => ContentDetailScreen(),
     SavedNewsScreen.routeName: (context) => SavedNewsScreen(),
     // region filter

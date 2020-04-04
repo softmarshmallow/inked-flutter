@@ -26,7 +26,9 @@ class News{
   List<String> tags = [];
 
   @JsonKey(ignore: true)
-  FilterResult filterResult;
+  NewsFilterResult filterResult;
+  @JsonKey(ignore: true)
+  List<NewsFilterResult> filterResults = [];
 
   factory News.fromJson(Map<String, dynamic> json) => _$NewsFromJson(json);
   Map<String, dynamic> toJson() => _$NewsToJson(this);
