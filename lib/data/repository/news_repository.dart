@@ -72,6 +72,7 @@ class NewsRepository extends BaseRepository<News> {
         }
       });
     }
+    onReplaced(news);
     onNewsUpdated?.call(news);
   }
 
