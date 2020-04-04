@@ -39,9 +39,9 @@ NewsMeta _$NewsMetaFromJson(Map<String, dynamic> json) {
     ..categories =
         (json['categories'] as List)?.map((e) => e as String)?.toList()
     ..category = json['category'] as String
-    ..crawledAt = json['crawledAt'] == null
+    ..crawlingAt = json['crawlingAt'] == null
         ? null
-        : DateTime.parse(json['crawledAt'] as String)
+        : DateTime.parse(json['crawlingAt'] as String)
     ..spamMarks = (json['spamMarks'] as List)
         ?.map((e) =>
             e == null ? null : SpamMark.fromJson(e as Map<String, dynamic>))
@@ -56,7 +56,7 @@ Map<String, dynamic> _$NewsMetaToJson(NewsMeta instance) => <String, dynamic>{
       'status': instance.status,
       'categories': instance.categories,
       'category': instance.category,
-      'crawledAt': instance.crawledAt?.toIso8601String(),
+      'crawlingAt': instance.crawlingAt?.toIso8601String(),
       'spamMarks': instance.spamMarks,
       'summary': instance.summary,
     };

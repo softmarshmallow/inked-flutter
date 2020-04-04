@@ -1,8 +1,6 @@
-//import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:inked/blocs/newslist/bloc.dart';
+import 'package:inked/blocs/livenewslist/bloc.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/screen/splash/splash.dart';
 import 'package:inked/utils/routes.dart';

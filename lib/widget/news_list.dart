@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-import 'package:inked/blocs/newslist/bloc.dart';
+import 'package:inked/blocs/livenewslist/bloc.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
-import 'package:inked/data/repository/news_repository.dart';
 import 'package:inked/screen/content_detail_screen.dart';
+import 'package:inked/utils/constants.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
 import 'package:inked/utils/elasticsearch/model.dart';
+import 'package:inked/utils/filters/utils.dart';
+import 'package:inked/utils/sounds/sound_util.dart';
 import 'package:inked/utils/text_highlight/highlighted_text.dart';
 import 'package:inked/utils/url_launch.dart';
-import 'package:intl/intl.dart';
 
 class LiveNewsListView extends StatefulWidget {
   final api = NewsApi(RemoteApiManager().getDio());
@@ -184,6 +185,17 @@ class NewsListItemActions {
 }
 
 // region child
+
+
+const Map<FilterAction, Color> colorMap = {
+  FilterAction.HIDE: Colors.black45,
+  FilterAction.NOTIFY: Colors.blueAccent,
+  FilterAction.IGNORE: Colors.black,
+  FilterAction.HIGHLIGHT: Colors.blueAccent,
+  FilterAction.ALERT: Colors.redAccent
+};
+
+
 class NewsListItem extends StatelessWidget {
   final News data;
   NewsListItemActions actions;
@@ -201,22 +213,13 @@ class NewsListItem extends StatelessWidget {
       this.timeFormatType = TimeFormatType.TODAY}) {
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
-      switch (data.filterResult.action) {
-        case FilterAction.HIDE:
-          _textColor = Colors.black45;
-          break;
-        case FilterAction.NOTIFY:
-          _textColor = Colors.blueAccent;
-          break;
-        case FilterAction.IGNORE:
-          _textColor = Colors.black;
-          break;
-        case FilterAction.HIGHLIGHT:
-          _textColor = Colors.blueAccent;
-          break;
-        case FilterAction.ALERT:
-          _textColor = Colors.redAccent;
-          break;
+      _textColor = colorMap[data.filterResult.action];
+      var shouldPlaySound = isHigherOrEven(high: data.filterResult.action, low: FilterAction.NOTIFY);
+      if (shouldPlaySound){
+        // play only crawled lately in 20 seconds
+        if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <= 20) {
+          playOnceInLifetime(data.id, SOUND_TONE_2_URL);
+        }
       }
     }
   }
@@ -350,15 +353,15 @@ class NewsListItem extends StatelessWidget {
 
   // content snippet section that holds (chips, summary, ect...)
   Widget _buildMetaSnippetSection(BuildContext context) {
-    if (data.tags != null && data.tags.length > 0) {
+    if (data.meta.tags != null && data.meta.tags.length > 0) {
       return SizedBox(
           height: 48,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
-              itemCount: data.tags.length,
+              itemCount: data.meta.tags.length,
               itemBuilder: (BuildContext context, int index) {
-                var item = data.tags[index];
+                var item = data.meta.tags[index];
                 return Padding(
                   padding: EdgeInsets.only(right: 4),
                   child: Chip(label: Text(item)),

@@ -102,6 +102,7 @@ class TermsFilterListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(_termsFilter.terms),
+      subtitle: Text(_termsFilter.action.toString()),
       trailing: IconButton(
         icon: Icon(Icons.remove_circle_outline),
         onPressed: () {

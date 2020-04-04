@@ -5,7 +5,7 @@ part 'news.g.dart';
 
 @JsonSerializable()
 class News{
-  News({this.title, this.content, this.provider, this.time, this.tags});
+  News({this.title, this.content, this.provider, this.time});
   @JsonKey(name: 'id')
   String id;
   @JsonKey(name: 'title')
@@ -21,9 +21,6 @@ class News{
 
   @JsonKey(name: 'meta')
   NewsMeta meta;
-
-  @JsonKey(ignore: true)
-  List<String> tags = [];
 
   @JsonKey(ignore: true)
   NewsFilterResult filterResult;
@@ -47,7 +44,7 @@ class NewsMeta {
   String status;
   List<String> categories;
   String category;
-  DateTime crawledAt;
+  DateTime crawlingAt;
   List<SpamMark> spamMarks;
   String summary;
 

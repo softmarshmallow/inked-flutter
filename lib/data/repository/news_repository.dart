@@ -23,13 +23,10 @@ class NewsRepository extends BaseRepository<News> {
   // endregion
 
   bool add(News newsItem) {
-    try {
-      var conflictIndex =
-          DATA.indexWhere((element) => element.id == newsItem.id);
-      DATA.removeAt(conflictIndex);
-      DATA.insert(conflictIndex, newsItem);
+    var replaced = replace(newsItem);
+    if (replaced) {
       return true;
-    } catch (e) {}
+    }
 
     DATA.insert(0, newsItem);
     onAdd(newsItem);
@@ -46,9 +43,22 @@ class NewsRepository extends BaseRepository<News> {
     throw UnimplementedError();
   }
 
+  bool replace(News news){
+    try {
+      var conflictIndex =
+      DATA.indexWhere((element) => element.id == news.id);
+      DATA.removeAt(conflictIndex);
+      DATA.insert(conflictIndex, news);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   NewsFilterRepository newsFilterRepository = NewsFilterRepository();
 
   onAdd(News news) async {
+    print(news.meta.tags);
     // convert meta spam to spam
     if (news.meta.spamMarks != null) {
       news.meta.spamMarks.forEach((element) {
@@ -65,10 +75,12 @@ class NewsRepository extends BaseRepository<News> {
     await processor.process();
     if (processor.highestMatched != null){
       news.filterResult = processor.highestMatched;
-      // make news update from ui
-      // processor.highestMatched.action -> perform action
+      replace(news);
+      onNewsUpdated?.call(news);
     }
   }
+
+  Function(News news) onNewsUpdated;
 
   get latestNews => DATA.first;
 }

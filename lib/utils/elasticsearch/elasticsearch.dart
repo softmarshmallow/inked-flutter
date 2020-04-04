@@ -6,7 +6,7 @@ class Elasticsearch {
   Dio dio;
 
   Elasticsearch(this._host) {
-    print("host is $_host");
+//    print("host is $_host");
     BaseOptions options = new BaseOptions(
       baseUrl: _host,
       connectTimeout: 5000,
@@ -127,7 +127,7 @@ class Elasticsearch {
       }
       var res = await searchInSingleDocument(doc, term);
       var matched = res.documents.length > 0;
-      print("doc: $doc matched: $matched for score ${res.maxScore}for term: $term");
+//      print("doc: $doc matched: $matched for score ${res.maxScore}for term: $term");
       if (matched) {
         return res;
       }  else{

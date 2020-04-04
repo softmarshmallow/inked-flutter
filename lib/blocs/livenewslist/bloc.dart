@@ -30,6 +30,11 @@ class NewNewsEvent extends NewsListEvent {
   final News news;
 }
 
+class NewsUpdatedEvent extends NewsListEvent{
+  const NewsUpdatedEvent(); // this.news
+//  final News news;
+}
+
 abstract class NewsListState extends Equatable {
   const NewsListState(this.news, this.newses);
 
@@ -73,36 +78,47 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
 //      _runFilters(news);
       var isAdded = repository.add(news);
       if (isAdded) {
+        print("new news event from bloc");
         add(NewNewsEvent(news));
       }
     });
+    repository.onNewsUpdated = (updated){
+      print("update news event from bloc");
+      add(NewNewsEvent(updated));
+    };
   }
 
   List<NewsFilter> filters = [MockFilterDatabase.mainFilter];
 
   @override
   Stream<NewsListState> mapEventToState(NewsListEvent event) async* {
+    NewsListState newsUpdate(News news){
+      switch (_focusType) {
+        case NewsItemFocusType.Focused:
+          return new FocusedStillState(_focusedNews, news);
+          break;
+        case NewsItemFocusType.NoFocus:
+          return NoFocusState();
+          break;
+        case NewsItemFocusType.TopFocus:
+          _focusedNews = repository.latestNews;
+          return TopFocusState(_focusedNews);
+          break;
+      }
+    }
+
     if (event is NewsFocusEvent) {
       _focusedNews = event.news;
       _focusType = NewsItemFocusType.Focused;
       yield FocusedState(_focusedNews);
     } else if (event is NewNewsEvent) {
-      switch (_focusType) {
-        case NewsItemFocusType.Focused:
-          yield new FocusedStillState(_focusedNews, event.news);
-          break;
-        case NewsItemFocusType.NoFocus:
-          yield NoFocusState();
-          break;
-        case NewsItemFocusType.TopFocus:
-          _focusedNews = repository.latestNews;
-          yield TopFocusState(_focusedNews);
-          break;
-      }
+      yield newsUpdate(event.news);
     } else if (event is TopFocusEvent) {
       _focusType = NewsItemFocusType.TopFocus;
       _focusedNews = repository.latestNews;
       yield TopFocusState(_focusedNews);
+    }else if (event is NewsUpdatedEvent){
+      yield newsUpdate(repository.latestNews);
     }
   }
 }

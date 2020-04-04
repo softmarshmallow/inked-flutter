@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:inked/blocs/newslist/bloc.dart';
+import 'package:inked/blocs/livenewslist/bloc.dart';
 import 'package:inked/data/repository/news_filter_repositry.dart';
 import 'package:inked/main.dart';
+import 'package:inked/utils/constants.dart';
+import 'package:inked/utils/sounds/sound_util.dart';
 
 class Splash extends StatefulWidget {
   static const routeName = "/splash";
@@ -17,6 +19,7 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   _SplashState() {
     initFirebaseWeb();
+    playOnceInLifetime("spash", SOUND_TONE_1_URL);
     loadEnv().then((value) {
       NewsFilterRepository().seed();
       moveHome();
