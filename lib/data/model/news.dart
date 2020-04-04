@@ -48,6 +48,16 @@ class NewsMeta {
   List<SpamMark> spamMarks;
   String summary;
 
+  @JsonKey(ignore: true)
+  bool get isSpam{
+    for (var m in spamMarks){
+      if (m.spam == SpamTag.SPAM){
+        return true;
+      }
+    }
+    return false;
+  }
+
   factory NewsMeta.fromJson(Map<String, dynamic> json) =>
       _$NewsMetaFromJson(json);
 

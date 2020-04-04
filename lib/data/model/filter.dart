@@ -20,7 +20,7 @@ class TokenFilter extends NewsFilter implements IFirebaseModel{
   @JsonKey(ignore: true)
   String id = DateTime.now().toIso8601String();
   String name = "untitled";
-  FilterAction action = FilterAction.NOTIFY;
+  FilterAction action;
   List<SingleTokenFilterLayer> filterLayers = [];
 
   List<TokenFilter> extraFilters = [];
@@ -65,7 +65,7 @@ class TermsFilter extends NewsFilter{
   String id;
   @JsonKey(name: "action")
   @override
-  FilterAction action = FilterAction.NOTIFY;
+  FilterAction action;
   @JsonKey(name: "terms")
   String terms;
 
@@ -101,10 +101,13 @@ enum FilterScope{
 }
 
 class NewsFilterResult{
-  NewsFilterResult(this.matched, {this.action, this.highlights});
+  NewsFilterResult(this.matched, {this.action, this.highlights, this.score, this.maxScore, this.terms,});
   final bool matched;
   final FilterAction action;
   final NewsHighlights highlights;
+  final String terms;
+  final score;
+  final maxScore;
 
   @override
   String toString() => "matched >> $matched action >> $action";

@@ -214,17 +214,22 @@ class NewsListItem extends StatelessWidget {
       this.actions,
       this.trail,
       this.timeFormatType = TimeFormatType.TODAY}) {
+    if (this.data.filterResult != null &&
+        this.data.filterResult.matched &&
+        this.data.filterResult.action == FilterAction.HIDE) {
+      return;
+    }
+
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       _textColor = colorMap[data.filterResult.action];
       var shouldPlaySound = isHigherOrEven(
           high: data.filterResult.action, low: FilterAction.NOTIFY);
       if (shouldPlaySound) {
-        print("should play sound");
         // play only crawled lately in 20 seconds
         if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
             120) {
-          print("will play sound");
+          print("will play sound ${data.title}");
           playOnceInLifetime(data.id, SOUND_TONE_2_URL);
         }
       }
@@ -235,12 +240,16 @@ class NewsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.filterResult != null &&
-        data.filterResult.matched &&
-        data.filterResult.action == FilterAction.HIDE) {
-      return SizedBox.shrink();
+    if (data.filterResult != null) {
+      if (data.filterResult.matched &&
+          data.filterResult.action == FilterAction.HIDE) {
+        return SizedBox.shrink();
+      }
+      if (data.filterResult.highlights != null) {
+        print(
+            "${data.filterResult?.action}, ${data.title}, \n title ${data.filterResult.highlights.title}\n content ${data.filterResult.highlights.content}\n scre : ${data.filterResult.score}\n terms: ${data.filterResult.terms}");
+      }
     }
-    print("${data.filterResult?.action}, ${data.title}");
 
     return InkWell(
         onTap: () {

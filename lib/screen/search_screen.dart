@@ -73,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
             var d = searchResults.documents[i];
 
             // todo change this location
-            d.source.filterResult = NewsFilterResult(true, action: FilterAction.HIGHLIGHT, highlights: d.highlight);
+            d.source.filterResult = NewsFilterResult(true, action: FilterAction.IGNORE, highlights: d.highlight);
 
             return Container(
               padding: EdgeInsets.only(top: 24),

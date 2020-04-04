@@ -11,6 +11,9 @@ const Map<FilterAction, int> filterActionScoreMap = {
 
 NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
   try {
+    if (filters == null || filters.length == 0) {
+      return null;
+    }
     NewsFilterResult highest;
     int highestScore = -1;
     for (var filter in filters) {
@@ -20,6 +23,7 @@ NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
         highest = filter;
       }
     }
+    print("highest is $highest");
     return highest;
   } catch (e) {
     return null;

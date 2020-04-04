@@ -29,8 +29,7 @@ class NewsRepository extends BaseRepository<News> {
 
     var replaced = replace(newsItem);
     if (replaced) {
-      // when analuze complete
-      onReplaced(newsItem);
+      onAdd(newsItem);
       return true;
     }
 
@@ -64,23 +63,25 @@ class NewsRepository extends BaseRepository<News> {
   NewsFilterRepository newsFilterRepository = NewsFilterRepository();
 
   onAdd(News news) async {
-    print(news.meta.tags);
     // convert meta spam to spam
-    if (news.meta.spamMarks != null) {
-      news.meta.spamMarks.forEach((element) {
-        if (element.spam == SpamTag.SPAM) {
-          news.filterResult = NewsFilterResult(
-            true,
-            action: FilterAction.HIDE,
-          );
-        }
-      });
+    if (news.meta.isSpam) {
+      news.filterResult = NewsFilterResult(
+        true,
+        action: FilterAction.HIDE,
+      );
     }
     onReplaced(news);
     onNewsUpdated?.call(news);
   }
 
   onReplaced(News news) async {
+
+    if (news.meta.isSpam) {
+      print("skipping due to spam.. ${news.title}");
+      return;
+    }
+
+    // es filter
     var processor = TermsFilterProcessor(news, newsFilterRepository.DATA);
     await processor.process();
     if (processor.highestMatched != null){
