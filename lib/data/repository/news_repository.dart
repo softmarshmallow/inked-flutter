@@ -4,8 +4,6 @@ import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/repository/base.dart';
 import 'package:inked/data/repository/news_filter_repositry.dart';
-import 'package:inked/utils/constants.dart';
-import 'package:inked/utils/elasticsearch/elasticsearch.dart';
 import 'package:inked/utils/filters/terms_filter_processor.dart';
 
 const MAX_NEWS_MEMORY_COUNT = 1000;
@@ -22,7 +20,13 @@ class NewsRepository extends BaseRepository<News> {
 
   // endregion
 
+  var excludePublisher = ["부산일보", "국민일보", "서울신문"];
   bool add(News newsItem) {
+    // quick fix todo -> migrate
+    if (excludePublisher.contains(newsItem.provider)) {
+      return false;
+    }
+
     var replaced = replace(newsItem);
     if (replaced) {
       // when analuze complete
