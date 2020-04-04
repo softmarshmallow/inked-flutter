@@ -22,8 +22,8 @@ class _TermsFilterScreenState extends State<TermsFilterScreen>
   NewsFilterRepository repository = NewsFilterRepository();
 
   _TermsFilterScreenState() {
-    _api =
-        NewsFilterApi(Dio()); //, baseUrl: "http://localhost:3000/api/filter/news/"
+    _api = NewsFilterApi(
+        Dio()); //, baseUrl: "http://localhost:3000/api/filter/news/"
   }
 
   @override
@@ -60,8 +60,10 @@ class _TermsFilterScreenState extends State<TermsFilterScreen>
       appBar: AppBar(
         title: Text("terms filter"),
       ),
-      body: Column(
-        children: <Widget>[_buildFilterList()],
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[_buildFilterList()],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
@@ -71,7 +73,8 @@ class _TermsFilterScreenState extends State<TermsFilterScreen>
   }
 
   _showCreateTermsFilterDialog() async {
-    var res = await showDialog(context: context, child: EditTermsFilterDialog());
+    var res =
+        await showDialog(context: context, child: EditTermsFilterDialog());
     if (res != null) {
       _createOne(res);
     }
@@ -82,7 +85,10 @@ class _TermsFilterScreenState extends State<TermsFilterScreen>
       return ListView.builder(
         itemBuilder: (c, i) {
           var filter = filters[i];
-          return TermsFilterListItem(filter, onRemove: _deleteOne,);
+          return TermsFilterListItem(
+            filter,
+            onRemove: _deleteOne,
+          );
         },
         itemCount: filters.length,
         shrinkWrap: true,
@@ -96,6 +102,7 @@ class _TermsFilterScreenState extends State<TermsFilterScreen>
 class TermsFilterListItem extends StatelessWidget {
   final TermsFilter _termsFilter;
   final Function(String id) onRemove;
+
   TermsFilterListItem(this._termsFilter, {this.onRemove});
 
   @override
