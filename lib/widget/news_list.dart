@@ -148,21 +148,25 @@ class NewsListView extends StatelessWidget {
                             data.filterResult.action == FilterAction.HIDE
                         ? []
                         : <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.report),
-                              onPressed: () {
-                                // mark as spam
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
-                                api.markSpamNews(SpamMarkRequest(
-                                    id: data.id, is_spam: true));
-                              },
-                            )
+//                            _spamMarkButton(data)
                           ],
                   );
                 },
               ));
+  }
+
+  Widget _spamMarkButton(News data){
+    return IconButton(
+      icon: Icon(Icons.report),
+      onPressed: () {
+        // mark as spam
+        Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
+        api.markSpamNews(SpamMarkRequest(
+            id: data.id, is_spam: true));
+      },
+    );
   }
 
   _scrollToFocused() {
@@ -196,6 +200,7 @@ const Map<FilterAction, Color> colorMap = {
 };
 
 
+const focusedColor = const Color(0xffe3e3e3);
 class NewsListItem extends StatelessWidget {
   final News data;
   NewsListItemActions actions;
@@ -239,7 +244,7 @@ class NewsListItem extends StatelessWidget {
           _onLongPress(context);
         },
         child: Container(
-            color: isFocused ? Colors.grey : null,
+            color: isFocused ? focusedColor : null,
             padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
             child: Column(
               children: <Widget>[

@@ -78,12 +78,10 @@ class NewsListBloc extends Bloc<NewsListEvent, NewsListState> {
 //      _runFilters(news);
       var isAdded = repository.add(news);
       if (isAdded) {
-        print("new news event from bloc");
         add(NewNewsEvent(news));
       }
     });
     repository.onNewsUpdated = (updated){
-      print("update news event from bloc");
       add(NewNewsEvent(updated));
     };
   }
