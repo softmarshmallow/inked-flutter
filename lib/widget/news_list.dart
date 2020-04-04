@@ -155,7 +155,7 @@ class NewsListView extends StatelessWidget {
               ));
   }
 
-  Widget _spamMarkButton(News data){
+  Widget _spamMarkButton(News data) {
     return IconButton(
       icon: Icon(Icons.report),
       onPressed: () {
@@ -163,8 +163,7 @@ class NewsListView extends StatelessWidget {
         Scaffold.of(context).showSnackBar(SnackBar(
             content: Text(
                 'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
-        api.markSpamNews(SpamMarkRequest(
-            id: data.id, is_spam: true));
+        api.markSpamNews(SpamMarkRequest(id: data.id, is_spam: true));
       },
     );
   }
@@ -190,7 +189,6 @@ class NewsListItemActions {
 
 // region child
 
-
 const Map<FilterAction, Color> colorMap = {
   FilterAction.HIDE: Colors.black45,
   FilterAction.NOTIFY: Colors.blueAccent,
@@ -199,8 +197,8 @@ const Map<FilterAction, Color> colorMap = {
   FilterAction.ALERT: Colors.redAccent
 };
 
-
 const focusedColor = const Color(0xffe3e3e3);
+
 class NewsListItem extends StatelessWidget {
   final News data;
   NewsListItemActions actions;
@@ -219,10 +217,14 @@ class NewsListItem extends StatelessWidget {
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       _textColor = colorMap[data.filterResult.action];
-      var shouldPlaySound = isHigherOrEven(high: data.filterResult.action, low: FilterAction.NOTIFY);
-      if (shouldPlaySound){
+      var shouldPlaySound = isHigherOrEven(
+          high: data.filterResult.action, low: FilterAction.NOTIFY);
+      if (shouldPlaySound) {
+        print("should play sound");
         // play only crawled lately in 20 seconds
-        if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <= 20) {
+        if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
+            120) {
+          print("will play sound");
           playOnceInLifetime(data.id, SOUND_TONE_2_URL);
         }
       }
@@ -233,6 +235,13 @@ class NewsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (data.filterResult != null &&
+        data.filterResult.matched &&
+        data.filterResult.action == FilterAction.HIDE) {
+      return SizedBox.shrink();
+    }
+    print("${data.filterResult?.action}, ${data.title}");
+
     return InkWell(
         onTap: () {
           _onTap(context);

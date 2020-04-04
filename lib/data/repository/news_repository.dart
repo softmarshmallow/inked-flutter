@@ -25,6 +25,8 @@ class NewsRepository extends BaseRepository<News> {
   bool add(News newsItem) {
     var replaced = replace(newsItem);
     if (replaced) {
+      // when analuze complete
+      onReplaced(newsItem);
       return true;
     }
 
@@ -70,7 +72,10 @@ class NewsRepository extends BaseRepository<News> {
         }
       });
     }
+    onNewsUpdated?.call(news);
+  }
 
+  onReplaced(News news) async {
     var processor = TermsFilterProcessor(news, newsFilterRepository.DATA);
     await processor.process();
     if (processor.highestMatched != null){
