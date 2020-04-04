@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:inked/data/model/news.dart';
-import 'package:inked/data/remote/base.dart';
+import 'package:inked/utils/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'news_api.g.dart';
 
-@RestApi(baseUrl: baseUrl)
+@RestApi(baseUrl: BASE_API_URL)
 abstract class NewsApi {
   factory NewsApi(Dio dio, {String baseUrl}) = _NewsApi;
 

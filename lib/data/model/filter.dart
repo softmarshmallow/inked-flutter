@@ -53,6 +53,15 @@ class SingleTokenFilterLayer implements IFirebaseModel{
 }
 
 
+class TermsFilter extends NewsFilter{
+  TermsFilter(this.terms, {this.name, @required this.action});
+  @override
+  String name;
+  @override
+  FilterAction action = FilterAction.Notify;
+  String terms;
+}
+
 enum OperationType{
   And,
   Or

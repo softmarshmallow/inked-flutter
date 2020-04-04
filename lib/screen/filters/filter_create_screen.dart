@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inked/blocs/token_filter_tester/bloc.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/dialogs/edit_token_filter_layer_dialog.dart';
 import 'package:inked/widget/section.dart';
 import 'package:inked/widget/singletokenfilterlayer_listtile.dart';
-import 'package:inked/widget/token_filter_tester.dart';
 
 class FilterCreateScreen extends StatefulWidget {
   static const routeName = "/settings/filter/new";

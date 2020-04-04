@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/data/model/filter.dart';
-import 'package:inked/screen/filter_create_screen.dart';
+import 'package:inked/screen/filters/filter_create_screen.dart';
 
 class FilterSettingsScreen extends StatefulWidget {
   static const String routeName = "/settings/filter/basics";

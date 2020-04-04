@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/development/socketio_development_screen.dart';
+import 'package:inked/utils/constants.dart';
 
 class DevelopmentLandingScreen extends StatefulWidget {
   static const routeName = "development/";
@@ -28,10 +29,7 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
               onTap: () async {
                 AudioPlayer audioPlayer = AudioPlayer();
                 var res = await audioPlayer.play(
-                    "https://freesound.org/data/previews/147/147597_2173181-lq.mp3");
-                print(res);
-//                var eres = await audioPlayer.play("assets/beep.mp3", isLocal: true);
-//                print(eres);
+                    SOUND_TONE_2_URL);
               },
             ),
             ListTile(
