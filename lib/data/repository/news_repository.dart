@@ -23,17 +23,24 @@ class NewsRepository extends BaseRepository<News> {
   var excludePublisher = [
     "부산일보",
     "국민일보",
+    "중앙일보",
     "서울신문",
     "연합뉴스TV",
     "경향신문",
     "SBS",
+    "MBC",
+    "MBN",
     "머니S",
     "노컷뉴스",
     "세계일보",
-    "MBC",
     "스포츠서울",
     "스포츠조선",
-
+    "일간스포츠",
+    "인포스탁",
+    "파이낸셜",
+    "파이낸셜뉴스",
+    "미디어오늘",
+    "아이뉴스24",
   ];
 
   bool add(News newsItem) {
