@@ -220,6 +220,7 @@ class NewsListItem extends StatelessWidget {
   final TimeFormatType timeFormatType;
   final Widget bottom;
   Color _textColor = Colors.black;
+  FilterAction _action = FilterAction.IGNORE;
 
   NewsListItem(this.data,
       {this.bottom,
@@ -229,7 +230,8 @@ class NewsListItem extends StatelessWidget {
       this.timeFormatType = TimeFormatType.TODAY}) {
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
-      _textColor = colorMap[data.filterResult.action];
+      _action = data.filterResult.action;
+      _textColor = colorMap[_action];
       if (shouldPlaySound(data.filterResult.action)) {
         // play only crawled lately in 120 seconds
         if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
@@ -339,31 +341,29 @@ class NewsListItem extends StatelessWidget {
   Widget _buildContentSection(BuildContext context) {
     var titleTextStyle =
         Theme.of(context).textTheme.subtitle1.copyWith(color: _textColor);
-    if (data.filterResult != null && data.filterResult.matched) {
-      switch (data.filterResult.action) {
-        case FilterAction.HIDE:
-          break;
-        case FilterAction.NOTIFY:
-          titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.bold);
-          break;
-        case FilterAction.IGNORE:
-          titleTextStyle =
-              titleTextStyle.copyWith(fontWeight: FontWeight.normal);
-          break;
-        case FilterAction.HIGHLIGHT:
-          titleTextStyle = titleTextStyle.copyWith(
-              fontWeight: FontWeight.bold, color: Colors.blueAccent);
-          break;
-        case FilterAction.ALERT:
-          titleTextStyle = titleTextStyle.copyWith(
-              fontWeight: FontWeight.bold, color: Colors.red);
-          break;
-        case FilterAction.SILENCE:
-          titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(
-              fontWeight: FontWeight.w300,
-              decoration: TextDecoration.lineThrough);
-          break;
-      }
+    switch (_action) {
+      case FilterAction.HIDE:
+        break;
+      case FilterAction.IGNORE:
+      // use default value
+        break;
+      case FilterAction.NOTIFY:
+        titleTextStyle = titleTextStyle.copyWith(
+            fontWeight: FontWeight.bold, color: Colors.blueAccent);
+        break;
+      case FilterAction.HIGHLIGHT:
+        titleTextStyle = titleTextStyle.copyWith(
+            fontWeight: FontWeight.bold, color: Colors.blueAccent);
+        break;
+      case FilterAction.ALERT:
+        titleTextStyle = titleTextStyle.copyWith(
+            fontWeight: FontWeight.bold, color: Colors.red);
+        break;
+      case FilterAction.SILENCE:
+        titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(
+            fontWeight: FontWeight.w300,
+            decoration: TextDecoration.lineThrough);
+        break;
     }
     return Expanded(
         flex: 10,
@@ -383,6 +383,11 @@ class NewsListItem extends StatelessWidget {
 
   // content snippet section that holds (chips, summary, ect...)
   Widget _buildMetaSnippetSection(BuildContext context) {
+    // do not show meta snippet if lower than ignore
+    if (_action == FilterAction.SILENCE) {
+      return SizedBox.shrink();
+    }
+
     var tagTextStyle = Theme.of(context)
         .textTheme
         .bodyText2

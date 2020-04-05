@@ -5,9 +5,9 @@ const Map<FilterAction, int> filterActionLevelMap = {
   FilterAction.ALERT: 4,
   FilterAction.NOTIFY: 3,
   FilterAction.HIGHLIGHT: 2,
-  FilterAction.SILENCE: 1,
-  FilterAction.HIDE: 0,
-  FilterAction.IGNORE: -1,
+  FilterAction.IGNORE: 0,
+  FilterAction.SILENCE: -1,
+  FilterAction.HIDE: -2,
 };
 
 NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
