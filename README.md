@@ -1,9 +1,13 @@
 # inked
 
+![](readme/1.png)
+
 this repo is mainly evil eye - flutter ported project.
 Supports
 * Web
-* Android / ios (not started)
+* Mac os
+* Windows (no audio support)
+* Android / ios
 
 ## Getting Started
 
