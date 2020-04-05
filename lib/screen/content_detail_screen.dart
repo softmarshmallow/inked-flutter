@@ -7,19 +7,14 @@ import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/utils/route_interface.dart';
 import 'package:inked/widget/content_detail.dart';
 
-class ContentDetailScreen extends StatefulWidget{
+class NewsContentDetailScreen extends StatefulWidget{
   static const routeName = "news/detail";
   @override
-  State<StatefulWidget> createState() => _ContentDetailScreen();
-
+  State<StatefulWidget> createState() => _NewsContentDetailScreenState();
 }
 
-class _ContentDetailScreen extends State<ContentDetailScreen> with AfterLayoutMixin<ContentDetailScreen>{
-
+class _NewsContentDetailScreenState extends State<NewsContentDetailScreen> with AfterLayoutMixin<NewsContentDetailScreen>{
   News news;
-
-
-
   @override
   void afterFirstLayout(BuildContext context) {
     if (news != null){

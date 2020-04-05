@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/blocs/livenewslist/bloc.dart';
+import 'package:inked/blocs/token_filter_tester/bloc.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
@@ -14,9 +15,13 @@ import 'package:inked/utils/filters/utils.dart';
 import 'package:inked/utils/sounds/sound_util.dart';
 import 'package:inked/utils/text_highlight/highlighted_text.dart';
 import 'package:inked/utils/url_launch.dart';
+import 'package:inked/widget/news_meta_tags_list.dart';
 
 class LiveNewsListView extends StatefulWidget {
-  final api = NewsApi(RemoteApiManager().getDio());
+  LiveNewsListView({this.filterNews, @required this.api});
+
+  final api;
+  final bool Function(News) filterNews;
 
   @override
   State<StatefulWidget> createState() => _LiveNewsListView();
@@ -31,7 +36,7 @@ class _LiveNewsListView extends State<LiveNewsListView> {
 
   onItemDoubleTap(News news) {
     Navigator.of(context)
-        .pushNamed(ContentDetailScreen.routeName, arguments: news);
+        .pushNamed(NewsContentDetailScreen.routeName, arguments: news);
   }
 
   onItemLongPress(News news) {
@@ -99,11 +104,19 @@ class _LiveNewsListView extends State<LiveNewsListView> {
     bloc.close();
   }
 
+  _filterNewses(List<News> newses) {
+    if (widget.filterNews == null) {
+      return newses;
+    }
+    return newses.where(widget.filterNews).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
       return NewsListView(
-        state.newses,
+        _filterNewses(state.newses),
+        api: widget.api,
         defaultItemAction: NewsListItemActions(onItemTap,
             onDoubleTap: onItemDoubleTap, onLongPress: onItemLongPress),
         focusedNews: state.news,
@@ -118,11 +131,11 @@ class NewsListView extends StatelessWidget {
   final ItemScrollController _scrollController = ItemScrollController();
   BuildContext context;
   int focusedIndex;
+  final NewsApi api;
 
-  NewsListView(this.news, {this.defaultItemAction, this.focusedNews, Key key})
-      : super(key: key);
+  NewsListView(this.news, {this.defaultItemAction, this.focusedNews, this.api});
+
   final NewsListItemActions defaultItemAction;
-  var api = NewsApi(RemoteApiManager().getDio());
 
   @override
   Widget build(BuildContext context) {
@@ -214,19 +227,11 @@ class NewsListItem extends StatelessWidget {
       this.actions,
       this.trail,
       this.timeFormatType = TimeFormatType.TODAY}) {
-    if (this.data.filterResult != null &&
-        this.data.filterResult.matched &&
-        this.data.filterResult.action == FilterAction.HIDE) {
-      return;
-    }
-
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       _textColor = colorMap[data.filterResult.action];
-      var shouldPlaySound = isHigherOrEven(
-          high: data.filterResult.action, low: FilterAction.NOTIFY);
-      if (shouldPlaySound) {
-        // play only crawled lately in 20 seconds
+      if (shouldPlaySound(data.filterResult.action)) {
+        // play only crawled lately in 120 seconds
         if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
             120) {
 //          print("will play sound ${data.title} ${data.filterResult.action}");
@@ -235,8 +240,6 @@ class NewsListItem extends StatelessWidget {
       }
     }
   }
-
-  var markedSpam = false;
 
   @override
   Widget build(BuildContext context) {
@@ -295,14 +298,10 @@ class NewsListItem extends StatelessWidget {
                 ),
                 _buildBottom(context),
                 Padding(
-                  padding:EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: 8),
                 ),
                 Divider(
-                    height: 1,
-                    indent: 72,
-                    thickness: 0.1,
-                    color: Colors.black
-                )
+                    height: 1, indent: 72, thickness: 0.1, color: Colors.black)
               ],
             )));
   }
@@ -328,7 +327,10 @@ class NewsListItem extends StatelessWidget {
     });
 
     if (combined.isNotEmpty) {
-      var emTextStyle = Theme.of(context).textTheme.caption.copyWith(fontWeight: FontWeight.bold, color: Colors.blueAccent);
+      var emTextStyle = Theme.of(context)
+          .textTheme
+          .caption
+          .copyWith(fontWeight: FontWeight.bold, color: Colors.blueAccent);
       return buildTextFromEm(combined, emTextStyle);
     }
     return SizedBox.shrink();
@@ -340,10 +342,6 @@ class NewsListItem extends StatelessWidget {
     if (data.filterResult != null && data.filterResult.matched) {
       switch (data.filterResult.action) {
         case FilterAction.HIDE:
-          titleTextStyle = Theme.of(context)
-              .textTheme
-              .subtitle2
-              .copyWith(fontWeight: FontWeight.w300);
           break;
         case FilterAction.NOTIFY:
           titleTextStyle = titleTextStyle.copyWith(fontWeight: FontWeight.bold);
@@ -360,9 +358,13 @@ class NewsListItem extends StatelessWidget {
           titleTextStyle = titleTextStyle.copyWith(
               fontWeight: FontWeight.bold, color: Colors.red);
           break;
+        case FilterAction.SILENCE:
+          titleTextStyle = Theme.of(context).textTheme.subtitle2.copyWith(
+              fontWeight: FontWeight.w300,
+              decoration: TextDecoration.lineThrough);
+          break;
       }
     }
-
     return Expanded(
         flex: 10,
         child: Column(
@@ -381,26 +383,13 @@ class NewsListItem extends StatelessWidget {
 
   // content snippet section that holds (chips, summary, ect...)
   Widget _buildMetaSnippetSection(BuildContext context) {
-    var tagTextStyle = Theme.of(context).textTheme.bodyText2.copyWith(fontWeight: FontWeight.normal);
+    var tagTextStyle = Theme.of(context)
+        .textTheme
+        .bodyText2
+        .copyWith(fontWeight: FontWeight.normal);
     if (data.meta.tags != null && data.meta.tags.length > 0) {
       return SizedBox(
-          height: 40,
-          child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: data.meta.tags.length,
-              itemBuilder: (BuildContext context, int index) {
-                var item = data.meta.tags[index];
-                return Padding(
-                  padding: EdgeInsets.only(right: 2),
-                  child: Chip(
-                    backgroundColor: Colors.grey[200],
-                      label: Text(
-                    item,
-                    style: tagTextStyle,
-                  )),
-                );
-              }));
+          height: 40, child: NewsMetaTagsList(data.meta.tags, tagTextStyle));
     } else {
       return SizedBox.shrink();
     }

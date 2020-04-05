@@ -1,9 +1,23 @@
 
 import 'package:flutter/material.dart';
 
+enum MainTabsType{
+  ALL,
+  EXCLUDE_SPAM,
+  ONLY_HITS
+}
+
+const Map<int, MainTabsType> TAB_MAP = {
+  0: MainTabsType.ALL,
+  1: MainTabsType.EXCLUDE_SPAM,
+  2: MainTabsType.ONLY_HITS,
+};
+
+
 class MainAppBar extends AppBar{
   final Function onSearchPressed;
-  MainAppBar({this.onSearchPressed}): super(
+  final Function(MainTabsType tab) onTabTap;
+  MainAppBar({this.onSearchPressed, this.onTabTap, }): super(
     title: Text("inked"),
     actions: <Widget>[
       IconButton(icon: Icon(Icons.search), onPressed: onSearchPressed,)
@@ -13,6 +27,9 @@ class MainAppBar extends AppBar{
       child: new Container(
         width: 500.0,
         child: new TabBar(
+          onTap: (i){
+            onTabTap?.call(TAB_MAP[i]);
+          },
           indicator: UnderlineTabIndicator(
               borderSide: BorderSide(width: 4.0),
               insets: EdgeInsets.symmetric(horizontal:0)

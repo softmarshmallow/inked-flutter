@@ -16,7 +16,7 @@ import 'package:inked/screen/splash/splash.dart';
 Map<String, WidgetBuilder> buildRoutes(BuildContext context){
   return {
     Splash.routeName: (context) => Splash(),
-    ContentDetailScreen.routeName: (context) => ContentDetailScreen(),
+    NewsContentDetailScreen.routeName: (context) => NewsContentDetailScreen(),
     SavedNewsScreen.routeName: (context) => SavedNewsScreen(),
     // region filter
     FilterSettingsScreen.routeName: (context) => FilterSettingsScreen(),

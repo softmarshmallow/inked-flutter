@@ -88,11 +88,12 @@ enum FilterMatchType{
 
 
 enum FilterAction{
-  HIDE,
+  ALERT,
   NOTIFY,
-  IGNORE,
   HIGHLIGHT,
-  ALERT
+  SILENCE,
+  HIDE,
+  IGNORE,
 }
 
 enum FilterScope{

@@ -91,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _onItemTap(News n) {
     Navigator.of(context)
-        .pushNamed(ContentDetailScreen.routeName, arguments: n);
+        .pushNamed(NewsContentDetailScreen.routeName, arguments: n);
   }
 
   Widget _buildPagination() {

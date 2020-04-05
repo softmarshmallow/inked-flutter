@@ -5,8 +5,9 @@ const Map<FilterAction, int> filterActionLevelMap = {
   FilterAction.ALERT: 4,
   FilterAction.NOTIFY: 3,
   FilterAction.HIGHLIGHT: 2,
-  FilterAction.HIDE: 1,
-  FilterAction.IGNORE: 0,
+  FilterAction.SILENCE: 1,
+  FilterAction.HIDE: 0,
+  FilterAction.IGNORE: -1,
 };
 
 NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
@@ -37,4 +38,13 @@ NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
 
 bool isHigherOrEven({@required FilterAction high, @required FilterAction low}) {
   return filterActionLevelMap[high] >= filterActionLevelMap[low];
+}
+
+bool shouldPlaySound(FilterAction action){
+  return isHigherOrEven(
+      high: action, low: FilterAction.NOTIFY);
+}
+
+bool shouldDisplayOnHits(FilterAction action){
+  return isHigherOrEven(high: action, low: FilterAction.HIGHLIGHT);
 }

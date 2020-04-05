@@ -90,11 +90,12 @@ class NewsRepository extends BaseRepository<News> {
     if (news.meta.isSpam) {
       news.filterResult = NewsFilterResult(
         true,
-        action: FilterAction.HIDE,
+        action: FilterAction.SILENCE,
       );
+    }else{
+      onReplaced(news);
     }
     replace(news);
-    onReplaced(news);
     onNewsUpdated?.call(news);
   }
 

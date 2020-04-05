@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/utils/url_launch.dart';
+import 'package:inked/widget/news_meta_info.dart';
 
 class ContentDetailView extends StatefulWidget {
   final News news;
@@ -27,7 +28,9 @@ class _ContentDetailView extends State<ContentDetailView> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               _buildTitleSection(),
+              Divider(),
               _buildContentSection(),
+              Divider(),
               _buildFooterSection()
             ],
           ),
@@ -86,6 +89,6 @@ class _ContentDetailView extends State<ContentDetailView> {
   }
 
   Widget _buildFooterSection() {
-    return SizedBox.shrink();
+    return NewsMetaInfo(widget.news);
   }
 }

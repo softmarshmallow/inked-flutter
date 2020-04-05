@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inked/blocs/livenewslist/bloc.dart';
+import 'package:inked/data/model/news.dart';
+import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/dialogs/search_dialog.dart';
+import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/splash/splash.dart';
+import 'package:inked/utils/filters/utils.dart';
 import 'package:inked/utils/routes.dart';
 import 'package:inked/widget/main_app_bar.dart';
 import 'package:inked/widget/main_drawer.dart';
@@ -45,10 +50,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   NewsListBloc bloc;
-
+  NewsApi api;
+  MainTabsType selectedTap = MainTabsType.EXCLUDE_SPAM;
   initState() {
     super.initState();
     bloc = BlocProvider.of<NewsListBloc>(context);
+    api = NewsApi(RemoteApiManager().getDio());
   }
 
   @override
@@ -61,10 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
       return DefaultTabController(
-        length: 3,
+        length: MainTabsType.values.length,
+        initialIndex: selectedTap.index,
         child: Scaffold(
           appBar: MainAppBar(
             onSearchPressed: _onSearchPressed,
+            onTabTap: _onTabTap,
           ),
           drawer: buildMainDrawer(context),
           body: _buildMasterDetailResponsive(),
@@ -75,8 +84,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMasterDetailResponsive() {
+    bool Function(News) filter;
+    switch (selectedTap){
+      case MainTabsType.ALL:
+        filter = null;
+        break;
+      case MainTabsType.EXCLUDE_SPAM:
+        filter = (n) => !n.meta.isSpam;
+        break;
+      case MainTabsType.ONLY_HITS:
+        filter = (n){
+          if (n.filterResult != null && n.filterResult.matched) {
+            if (shouldDisplayOnHits(n.filterResult.action)) {
+              return true;
+            }
+          }
+          return false;
+        };
+        break;
+    }
     return Stack(
-      children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
+      children: <Widget>[LiveNewsListView(api: api, filterNews: filter,), PositionedNewsContentHolder()],
     );
   }
 
@@ -95,8 +123,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _openSearchDialog();
   }
 
+  _onTabTap(MainTabsType tab){
+    setState(() {
+      selectedTap = tab;
+    });
+  }
+
   _openSearchDialog() {
-    showDialog(
-        context: context, builder: (BuildContext context) => SearchDialog());
+    Navigator.of(context).pushNamed(SearchScreen.routeName);
+//    showDialog(
+//        context: context, builder: (BuildContext context) => SearchDialog());
   }
 }
