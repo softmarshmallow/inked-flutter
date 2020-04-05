@@ -20,7 +20,22 @@ class NewsRepository extends BaseRepository<News> {
 
   // endregion
 
-  var excludePublisher = ["부산일보", "국민일보", "서울신문", "연합뉴스TV", "경향신문", "SBS", "머니S", "노컷뉴스", "세계일보"];
+  var excludePublisher = [
+    "부산일보",
+    "국민일보",
+    "서울신문",
+    "연합뉴스TV",
+    "경향신문",
+    "SBS",
+    "머니S",
+    "노컷뉴스",
+    "세계일보",
+    "MBC",
+    "스포츠서울",
+    "스포츠조선",
+
+  ];
+
   bool add(News newsItem) {
     // quick fix todo -> migrate
     if (excludePublisher.contains(newsItem.provider)) {
@@ -48,10 +63,9 @@ class NewsRepository extends BaseRepository<News> {
     throw UnimplementedError();
   }
 
-  bool replace(News news){
+  bool replace(News news) {
     try {
-      var conflictIndex =
-      DATA.indexWhere((element) => element.id == news.id);
+      var conflictIndex = DATA.indexWhere((element) => element.id == news.id);
       DATA.removeAt(conflictIndex);
       onNewsUpdated?.call(news);
       DATA.insert(conflictIndex, news);
@@ -78,7 +92,6 @@ class NewsRepository extends BaseRepository<News> {
   }
 
   onReplaced(News news) async {
-
     if (news.meta.isSpam) {
       print("skipping due to spam.. ${news.title}");
       return;
@@ -87,7 +100,7 @@ class NewsRepository extends BaseRepository<News> {
     // es filter
     var processor = TermsFilterProcessor(news, newsFilterRepository.DATA);
     await processor.process();
-    if (processor.highestMatched != null){
+    if (processor.highestMatched != null) {
       news.filterResult = processor.highestMatched;
       replace(news);
       onNewsUpdated?.call(news);
