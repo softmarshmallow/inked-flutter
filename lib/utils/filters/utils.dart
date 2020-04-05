@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:inked/data/model/filter.dart';
 
-const Map<FilterAction, int> filterActionScoreMap = {
+const Map<FilterAction, int> filterActionLevelMap = {
   FilterAction.ALERT: 4,
   FilterAction.NOTIFY: 3,
   FilterAction.HIGHLIGHT: 2,
@@ -15,11 +15,16 @@ NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
       return null;
     }
     NewsFilterResult highest;
-    int highestScore = -1;
+    int highestLevel = -1;
     for (var filter in filters) {
-      var score = filterActionScoreMap[filter.action];
-      if (score > highestScore) {
-        highestScore = score;
+      var level = filterActionLevelMap[filter.action];
+      if (level == highestLevel) {
+        if (highest.score < filter.score){
+          highestLevel = level;
+          highest = filter;
+        }
+      } else if (level > highestLevel) {
+        highestLevel = level;
         highest = filter;
       }
     }
@@ -31,5 +36,5 @@ NewsFilterResult getHighestNewsFilterResult(List<NewsFilterResult> filters) {
 }
 
 bool isHigherOrEven({@required FilterAction high, @required FilterAction low}) {
-  return filterActionScoreMap[high] >= filterActionScoreMap[low];
+  return filterActionLevelMap[high] >= filterActionLevelMap[low];
 }

@@ -4,7 +4,7 @@ import 'package:inked/data/model/news.dart';
 import 'package:inked/utils/elasticsearch/elasticsearch.dart';
 import 'package:inked/utils/filters/utils.dart';
 
-const MIN_SCORE = 1.0;
+const MIN_SCORE = 5.0;
 class TermsFilterProcessor {
   TermsFilterProcessor(this.news, this.filters);
 

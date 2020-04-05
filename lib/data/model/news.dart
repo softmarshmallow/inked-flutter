@@ -31,7 +31,7 @@ class News{
   Map<String, dynamic> toJson() => _$NewsToJson(this);
 
   @override
-  String toString() => "${time.toIso8601String()}: $title";
+  String toString() => "${time.toIso8601String()}: $title \t$meta \t$filterResult";
 }
 
 @JsonSerializable()
@@ -62,6 +62,11 @@ class NewsMeta {
       _$NewsMetaFromJson(json);
 
   Map<String, dynamic> toJson() => _$NewsMetaToJson(this);
+
+  @override
+  String toString() {
+    return "tags:$tags spam:$isSpam";
+  }
 }
 
 @JsonSerializable()

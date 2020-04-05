@@ -20,7 +20,7 @@ class NewsRepository extends BaseRepository<News> {
 
   // endregion
 
-  var excludePublisher = ["부산일보", "국민일보", "서울신문"];
+  var excludePublisher = ["부산일보", "국민일보", "서울신문", "연합뉴스TV", "경향신문", "SBS", "머니S", "노컷뉴스", "세계일보"];
   bool add(News newsItem) {
     // quick fix todo -> migrate
     if (excludePublisher.contains(newsItem.provider)) {
@@ -53,7 +53,9 @@ class NewsRepository extends BaseRepository<News> {
       var conflictIndex =
       DATA.indexWhere((element) => element.id == news.id);
       DATA.removeAt(conflictIndex);
+      onNewsUpdated?.call(news);
       DATA.insert(conflictIndex, news);
+      onNewsUpdated?.call(news);
       return true;
     } catch (e) {
       return false;
@@ -70,6 +72,7 @@ class NewsRepository extends BaseRepository<News> {
         action: FilterAction.HIDE,
       );
     }
+    replace(news);
     onReplaced(news);
     onNewsUpdated?.call(news);
   }
@@ -88,6 +91,11 @@ class NewsRepository extends BaseRepository<News> {
       news.filterResult = processor.highestMatched;
       replace(news);
       onNewsUpdated?.call(news);
+    }
+
+    if (news.filterResult != null && news.filterResult.highlights != null) {
+      print(
+          "${news.filterResult?.action}, ${news.title}, \n title ${news.filterResult.highlights.title}\n content ${news.filterResult.highlights.content}\n scre : ${news.filterResult.score}\n terms: ${news.filterResult.terms}");
     }
   }
 

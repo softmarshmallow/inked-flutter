@@ -229,7 +229,7 @@ class NewsListItem extends StatelessWidget {
         // play only crawled lately in 20 seconds
         if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
             120) {
-          print("will play sound ${data.title}");
+          print("will play sound ${data.title} ${data.filterResult.action}");
           playOnceInLifetime(data.id, SOUND_TONE_2_URL);
         }
       }
@@ -244,10 +244,6 @@ class NewsListItem extends StatelessWidget {
       if (data.filterResult.matched &&
           data.filterResult.action == FilterAction.HIDE) {
         return SizedBox.shrink();
-      }
-      if (data.filterResult.highlights != null) {
-        print(
-            "${data.filterResult?.action}, ${data.title}, \n title ${data.filterResult.highlights.title}\n content ${data.filterResult.highlights.content}\n scre : ${data.filterResult.score}\n terms: ${data.filterResult.terms}");
       }
     }
 
