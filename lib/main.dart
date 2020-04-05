@@ -4,11 +4,13 @@ import 'package:inked/blocs/livenewslist/bloc.dart';
 import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/screen/splash/splash.dart';
 import 'package:inked/utils/routes.dart';
+import 'package:inked/widget/main_app_bar.dart';
 import 'package:inked/widget/main_drawer.dart';
 import 'package:inked/widget/news_list.dart';
 import 'package:inked/widget/position_news_content_holder.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
+
 void main() {
   // See https://github.com/flutter/flutter/wiki/Desktop-shells#target-platform-override
   debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
@@ -17,20 +19,18 @@ void main() {
   runApp(App());
 }
 
-
 class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'inked inteligence',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.yellow,
-      ),
-      routes: buildRoutes(context),
-      home: Splash()
-    );
+        title: 'inked inteligence',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.yellow,
+        ),
+        routes: buildRoutes(context),
+        home: Splash());
   }
 }
 
@@ -60,20 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NewsListBloc, NewsListState>(builder: (context, state) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.search), onPressed: _onSearchPressed)
-          ],
+      return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: MainAppBar(
+            onSearchPressed: _onSearchPressed,
+          ),
+          drawer: buildMainDrawer(context),
+          body: _buildMasterDetailResponsive(),
+          floatingActionButton: _buildFab(context, state),
         ),
-        drawer: buildMainDrawer(context),
-        body: Stack(
-          children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
-        ),
-        floatingActionButton: _buildFab(context, state),
       );
     });
+  }
+
+  Widget _buildMasterDetailResponsive() {
+    return Stack(
+      children: <Widget>[LiveNewsListView(), PositionedNewsContentHolder()],
+    );
   }
 
   Widget _buildFab(BuildContext context, NewsListState state) {

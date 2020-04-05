@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/development/socketio_development_screen.dart';
+import 'package:inked/screen/development/tab_bar_demo.dart';
 import 'package:inked/utils/constants.dart';
 
 class DevelopmentLandingScreen extends StatefulWidget {
@@ -28,8 +29,7 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
               title: Text('dev - sound'),
               onTap: () async {
                 AudioPlayer audioPlayer = AudioPlayer();
-                var res = await audioPlayer.play(
-                    SOUND_TONE_2_URL);
+                var res = await audioPlayer.play(SOUND_TONE_2_URL);
               },
             ),
             ListTile(
@@ -38,11 +38,17 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
                 Navigator.of(context).pushNamed(FirestoreTestScreen.routeName);
               },
             ),
-
             ListTile(
               title: Text('dev - socket io'),
               onTap: () {
-                Navigator.of(context).pushNamed(SocketioDevelopmentScreen.routeName);
+                Navigator.of(context)
+                    .pushNamed(SocketioDevelopmentScreen.routeName);
+              },
+            ),
+            ListTile(
+              title: Text('tab bar'),
+              onTap: () {
+                Navigator.of(context).pushNamed(TabBarDemoScreen.routeName);
               },
             ),
           ],

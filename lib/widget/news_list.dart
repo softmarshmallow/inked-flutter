@@ -259,7 +259,7 @@ class NewsListItem extends StatelessWidget {
         },
         child: Container(
             color: isFocused ? focusedColor : null,
-            padding: EdgeInsets.only(left: 16, top: 8.0, right: 16, bottom: 8),
+            padding: EdgeInsets.only(left: 16, top: 8.0, right: 16),
             child: Column(
               children: <Widget>[
                 Row(
@@ -294,6 +294,15 @@ class NewsListItem extends StatelessWidget {
                   ],
                 ),
                 _buildBottom(context),
+                Padding(
+                  padding:EdgeInsets.only(bottom: 8),
+                ),
+                Divider(
+                    height: 1,
+                    indent: 72,
+                    thickness: 0.1,
+                    color: Colors.black
+                )
               ],
             )));
   }
@@ -319,15 +328,15 @@ class NewsListItem extends StatelessWidget {
     });
 
     if (combined.isNotEmpty) {
-      return buildTextFromEm(combined,
-          Theme.of(context).textTheme.caption.copyWith(color: Colors.red));
+      var emTextStyle = Theme.of(context).textTheme.caption.copyWith(fontWeight: FontWeight.bold, color: Colors.blueAccent);
+      return buildTextFromEm(combined, emTextStyle);
     }
     return SizedBox.shrink();
   }
 
   Widget _buildContentSection(BuildContext context) {
     var titleTextStyle =
-        Theme.of(context).textTheme.headline6.copyWith(color: _textColor);
+        Theme.of(context).textTheme.subtitle1.copyWith(color: _textColor);
     if (data.filterResult != null && data.filterResult.matched) {
       switch (data.filterResult.action) {
         case FilterAction.HIDE:
@@ -372,9 +381,10 @@ class NewsListItem extends StatelessWidget {
 
   // content snippet section that holds (chips, summary, ect...)
   Widget _buildMetaSnippetSection(BuildContext context) {
+    var tagTextStyle = Theme.of(context).textTheme.bodyText2.copyWith(fontWeight: FontWeight.normal);
     if (data.meta.tags != null && data.meta.tags.length > 0) {
       return SizedBox(
-          height: 48,
+          height: 40,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
@@ -382,8 +392,13 @@ class NewsListItem extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 var item = data.meta.tags[index];
                 return Padding(
-                  padding: EdgeInsets.only(right: 4),
-                  child: Chip(label: Text(item)),
+                  padding: EdgeInsets.only(right: 2),
+                  child: Chip(
+                    backgroundColor: Colors.grey[200],
+                      label: Text(
+                    item,
+                    style: tagTextStyle,
+                  )),
                 );
               }));
     } else {
