@@ -17,6 +17,7 @@ class TermsFilterProcessor {
   process() async {
     // es search
     var es = Elasticsearch(_host.toString());
+    await new Future.delayed(const Duration(seconds : 1));
     if (filters.length > 0) {
       for (var temFilter in filters) {
         var term = temFilter.terms;
