@@ -1,7 +1,7 @@
 # inked
-
-![](readme/macos-1.png){:height="50%" width="50%"}
-![](readme/ios-1.jpeg){:height="700px" width="100px"}
+![](readme/logo-long.png)
+![](readme/macos-1.png)
+![](readme/ios-1.jpeg)
 
 this repo is mainly evil eye - flutter ported project.
 Supports

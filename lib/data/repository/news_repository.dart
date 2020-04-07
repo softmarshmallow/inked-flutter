@@ -41,6 +41,20 @@ class NewsRepository extends BaseRepository<News> {
     "파이낸셜뉴스",
     "미디어오늘",
     "아이뉴스24",
+    "강원일보",
+    "KBS",
+    "스포츠동아",
+    "한겨레",
+    "프레시안",
+    "동아사이언스",
+    "오마이뉴스",
+    "채널A",
+    "매일신문",
+    "JTBC",
+    "한국경제TV",
+    "데일리안",
+    "코메디닷컴",
+    "조세일보"
   ];
 
   bool add(News newsItem) {

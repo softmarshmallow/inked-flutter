@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:inked/utils/elasticsearch/model.dart';
+import 'dart:developer' as developer;
 
 class Elasticsearch {
   final String _host;
@@ -76,6 +77,7 @@ class Elasticsearch {
       var res = await dio.head("/news/_doc/$id");
       return res.statusCode == 200;
     } catch (e) {
+      print(e);
       return false;
     }
   }
@@ -133,10 +135,8 @@ class Elasticsearch {
     return searchRes;
   }
 
-  Future<SearchResponse<NewsDocumentResult>> documentMatches(
-      String doc, String term) async {
+  Future<SearchResponse<NewsDocumentResult>> documentMatches(String doc, String term) async {
     try {
-      await new Future.delayed(const Duration(seconds: 1));
       var exists = await documentExists(doc);
       if (!exists) {
         print("document is not ready to search $doc");
@@ -147,7 +147,7 @@ class Elasticsearch {
 //      print("doc: $doc matched: $matched for score ${res.maxScore}for term: $term");
       if (matched) {
         return res;
-      } else {
+      }  else{
         return null;
       }
     } catch (e) {
