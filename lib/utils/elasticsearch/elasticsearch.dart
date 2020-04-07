@@ -81,18 +81,34 @@ class Elasticsearch {
   }
 
   Future<SearchResponse<NewsDocumentResult>> searchInSingleDocument(
-      String doc, String term) async {
+      String doc, String term,
+      {bool matchPhrase = false}) async {
+    var matchPhraseQuery = {
+      "multi_match": {
+        "query": term,
+        "type": "phrase",
+        "fields": ["title", "content"]
+      }
+    };
+
+    var simpleQuery = {
+      "simple_query_string": {
+        "query": term,
+        "fields": ["title", "content"]
+      }
+    };
+
+    var query;
+    if (matchPhrase) {
+      query = matchPhraseQuery;
+    } else {
+      query = simpleQuery;
+    }
+
     var q = {
       "query": {
         "bool": {
-          "must": [
-            {
-              "simple_query_string": {
-                "query": term,
-                "fields": ["title", "content"]
-              }
-            }
-          ],
+          "must": [query],
           "filter": {
             "ids": {
               "values": [doc]
@@ -117,9 +133,10 @@ class Elasticsearch {
     return searchRes;
   }
 
-  Future<SearchResponse<NewsDocumentResult>> documentMatches(String doc, String term) async {
+  Future<SearchResponse<NewsDocumentResult>> documentMatches(
+      String doc, String term) async {
     try {
-      await new Future.delayed(const Duration(seconds : 1));
+      await new Future.delayed(const Duration(seconds: 1));
       var exists = await documentExists(doc);
       if (!exists) {
         print("document is not ready to search $doc");
@@ -130,7 +147,7 @@ class Elasticsearch {
 //      print("doc: $doc matched: $matched for score ${res.maxScore}for term: $term");
       if (matched) {
         return res;
-      }  else{
+      } else {
         return null;
       }
     } catch (e) {
