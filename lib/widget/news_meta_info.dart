@@ -9,6 +9,9 @@ class NewsMetaInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if(news.meta == null){
+      return LinearProgressIndicator();
+    }
     return Container(
       padding: EdgeInsets.all(16),
       child: Column(
@@ -25,7 +28,7 @@ class NewsMetaInfo extends StatelessWidget {
   }
 
   Widget _buildTags(BuildContext context) {
-    if (news.meta.tags.length == 0) {
+    if (news.meta.tags == null || news.meta.tags?.length == 0) {
       return SizedBox.shrink();
     }
     return SizedBox(

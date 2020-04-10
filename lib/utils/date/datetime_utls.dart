@@ -14,6 +14,9 @@ String formatTimeHuman(DateTime time, TimeFormatType format){
     case TimeFormatType.MAX:
       return DateFormat("y/M/d hh:mm:ss").format(time);
       break;
+    case TimeFormatType.THIS_YEAR:
+      return DateFormat("y/M/d").format(time);
+      break;
   }
 }
 
@@ -22,5 +25,6 @@ enum TimeFormatType{
   RECENT,
   TODAY,
   THIS_MONTH,
+  THIS_YEAR,
   MAX
 }

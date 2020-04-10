@@ -34,6 +34,7 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.yellow,
         ),
+        darkTheme: ThemeData.dark(),
         routes: buildRoutes(context),
         home: Splash());
   }

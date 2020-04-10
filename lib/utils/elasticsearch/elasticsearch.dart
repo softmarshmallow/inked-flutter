@@ -17,7 +17,7 @@ class Elasticsearch {
   }
 
   Future<SearchResponse<NewsDocumentResult>> searchMultiMatch(String term,
-      {int size = 20, int page = 1}) async {
+      {int size = 20, int page = 1, DateTime timeFrom, DateTime timeTo}) async {
     int from = (page - 1) * size;
     try {
       var q = {
@@ -34,7 +34,7 @@ class Elasticsearch {
             "filter": [
               {
                 "range": {
-                  "time": {"gte": "now-1d"}
+                  "time": {"gte": timeFrom?.toIso8601String(), "lte": timeTo?.toIso8601String()}
                 }
               },
               {
@@ -51,6 +51,10 @@ class Elasticsearch {
         "highlight": {
           "fields": {"content": {}, "title": {}}
         },
+        "sort" : [
+          { "time" : {"order" : "desc"}},
+          "_score"
+        ],
         "size": size,
         "from": from
       };

@@ -25,6 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _loading = false;
   int page = 1;
   final ScrollController _scrollController = ScrollController();
+  DateTime startDate = DateTime.now().subtract(Duration(days: 7));
 
   @override
   Widget build(BuildContext context) {
@@ -73,13 +74,15 @@ class _SearchScreenState extends State<SearchScreen> {
             var d = searchResults.documents[i];
 
             // todo change this location
-            d.source.filterResult = NewsFilterResult(true, action: FilterAction.IGNORE, highlights: d.highlight);
+            d.source.filterResult = NewsFilterResult(true,
+                action: FilterAction.IGNORE, highlights: d.highlight);
 
             return Container(
               padding: EdgeInsets.only(top: 24),
-              child: NewsListItem(d.source,
-                  timeFormatType: TimeFormatType.THIS_MONTH,
-                  actions: NewsListItemActions(_onItemTap),
+              child: NewsListItem(
+                d.source,
+                timeFormatType: TimeFormatType.THIS_MONTH,
+                actions: NewsListItemActions(_onItemTap),
               ),
             );
           },
@@ -126,55 +129,118 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSearchInput() {
     return Container(
-      padding: EdgeInsets.all(24),
-      width: MediaQuery.of(context).size.width,
-      child: TextField(
-        autofocus: true,
-        decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            border: InputBorder.none,
-            hintText: 'Enter a search term'),
-        onChanged: (s) {
-          setState(() {
-            _term = s;
-          });
-        },
-        onSubmitted: (s) {
-          _search();
-        },
-      ),
-    );
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: TextField(
+                autofocus: true,
+                decoration: InputDecoration(
+                    filled: true,
+                    border: InputBorder.none,
+                    hintText: 'Enter a search term'),
+                onChanged: (s) {
+                  setState(() {
+                    _term = s;
+                  });
+                },
+                onSubmitted: (s) {
+                  _search();
+                },
+              ),
+            ),
+            Row(
+              children: [
+                _buildDurationPicker(),
+                _buildCustomDatePicker(),
+                Spacer(),
+                RaisedButton(
+                  child: Text("search"),
+                  onPressed: _search,
+                )
+              ],
+            ),
+          ],
+        ));
   }
 
-  String duration = "now-1d";
-  List<String> durations = ["now-1d", "now-1h", "now-1w"];
+
+  Widget _buildCustomDatePicker(){
+    if(useCustomDate){
+      return Container(
+        child: FlatButton(
+          child: Text(
+              "from ${formatTimeHuman(startDate, TimeFormatType.THIS_YEAR)}"),
+          onPressed: () async {
+            var newStartDate = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(2018),
+              lastDate: DateTime(2030),
+              builder: (BuildContext context, Widget child) {
+                return child;
+              },
+            );
+            if (newStartDate != null) {
+              setState(() {
+                startDate = newStartDate;
+              });
+            }
+          },
+        ),
+      );
+    }else{
+      return SizedBox.shrink();
+    }
+  }
+
+
+  static const Map<String, Duration> durationMap = {
+    "1 hour": Duration(hours: 1),
+    "1 day":  Duration(days: 1),
+    "1 week":  Duration(days: 7),
+    "2 weeks":  Duration(days: 14),
+    "1 month":  Duration(days: 30),
+    "3 months":  Duration(days: 90),
+    "custom": null
+  };
+  static const defaultKey = "2 weeks";
+  String durationKey = defaultKey;
+  bool useCustomDate = false;
+  Duration duration = durationMap[defaultKey];
 
   Widget _buildDurationPicker() {
     return DropdownButton(
-      value: duration,
+      value: durationKey,
       onChanged: (String value) {
         setState(() {
-          duration = value;
+          durationKey = value;
+          duration = durationMap[value];
+          useCustomDate = value == "custom";
+          if(! useCustomDate){
+            startDate = DateTime.now().subtract(duration);
+          }
         });
       },
-      items: durations.map((String action) {
+      items: durationMap.keys.map((String action) {
         return DropdownMenuItem<String>(
             value: action, child: Text(action.toString()));
       }).toList(),
     );
   }
 
-
   _search() async {
+    print("search started with term of '$_term'");
+
     var esHost = DotEnv().env["ES_HOST"];
 
     setState(() {
       _loading = true;
     });
 
-    searchResults =
-        await Elasticsearch(esHost).searchMultiMatch(_term, page: page);
+    searchResults = await Elasticsearch(esHost)
+        .searchMultiMatch(_term, page: page, timeFrom: startDate);
     setState(() {
       _loading = false;
       searchResults = searchResults;
