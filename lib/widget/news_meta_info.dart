@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/widget/news_meta_tags_list.dart';
 
@@ -21,7 +22,8 @@ class NewsMetaInfo extends StatelessWidget {
           Text("is spam : ${news.meta.isSpam}"),
           _buildSpamReason(),
           _buildTags(context),
-          _buildFilterResult()
+          _buildFilterResult(),
+          _buildDeveloperTools(),
         ],
       ),
     );
@@ -56,5 +58,11 @@ class NewsMetaInfo extends StatelessWidget {
       reason += "${mark.reason}\n";
     }
     return Text(reason);
+  }
+
+  Widget _buildDeveloperTools() {
+    return RaisedButton(child: Text("copy"), onPressed: (){
+      Clipboard.setData(ClipboardData(text: news.content));
+    },);
   }
 }
