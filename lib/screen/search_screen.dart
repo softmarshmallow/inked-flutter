@@ -165,6 +165,10 @@ class _SearchScreenState extends State<SearchScreen> {
         ));
   }
 
+  Widget _buildRecentHistorySelection(){
+
+  }
+
 
   Widget _buildCustomDatePicker(){
     if(useCustomDate){

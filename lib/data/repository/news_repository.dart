@@ -1,5 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/repository/base.dart';
@@ -137,4 +135,7 @@ class NewsRepository extends BaseRepository<News> {
   Function(News news) onNewsUpdated;
 
   get latestNews => DATA.first;
+
+  @override
+  seed() {}
 }

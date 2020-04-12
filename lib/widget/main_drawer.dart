@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:inked/screen/development/development_landing_screen.dart';
-import 'package:inked/screen/filters/filter_settings_screen.dart';
 import 'package:inked/screen/filters/filter_terms_screen.dart';
 import 'package:inked/screen/filters/filter_testing_screen.dart';
+import 'package:inked/screen/providers_selectin_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
@@ -27,6 +27,13 @@ Widget buildMainDrawer(BuildContext context) {
           },
         ),
         ListTile(
+          leading: Icon(Icons.filter_list),
+          title: Text('provider settings'),
+          onTap: () {
+            Navigator.of(context).pushNamed(ProvidersSelectionScreen.routeName);
+          },
+        ),
+        ListTile(
           leading: Icon(Icons.search),
           title: Text('search'),
           onTap: () {
@@ -34,17 +41,17 @@ Widget buildMainDrawer(BuildContext context) {
           },
         ),
         ListTile(
+          leading: Icon(Icons.inbox),
+          title: Text('saved'),
+          onTap: () {
+            Navigator.of(context).pushNamed(FavoriteNewsScreen.routeName);
+          },
+        ),
+        ListTile(
           leading: Icon(Icons.filter_list),
           title: Text('filter testing'),
           onTap: () {
             Navigator.of(context).pushNamed(FilterTestingScreen.routeName);
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.inbox),
-          title: Text('saved'),
-          onTap: () {
-            Navigator.of(context).pushNamed(SavedNewsScreen.routeName);
           },
         ),
         ListTile(

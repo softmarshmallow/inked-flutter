@@ -8,6 +8,7 @@ import 'package:inked/screen/filters/filter_create_screen.dart';
 import 'package:inked/screen/filters/filter_settings_screen.dart';
 import 'package:inked/screen/filters/filter_terms_screen.dart';
 import 'package:inked/screen/filters/filter_testing_screen.dart';
+import 'package:inked/screen/providers_selectin_screen.dart';
 import 'package:inked/screen/saved_news_screen.dart';
 import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/spam_or_not_screen.dart';
@@ -17,7 +18,7 @@ Map<String, WidgetBuilder> buildRoutes(BuildContext context){
   return {
     Splash.routeName: (context) => Splash(),
     NewsContentDetailScreen.routeName: (context) => NewsContentDetailScreen(),
-    SavedNewsScreen.routeName: (context) => SavedNewsScreen(),
+    FavoriteNewsScreen.routeName: (context) => FavoriteNewsScreen(),
     // region filter
     FilterSettingsScreen.routeName: (context) => FilterSettingsScreen(),
     FilterCreateScreen.routeName: (context) => FilterCreateScreen(),
@@ -26,7 +27,7 @@ Map<String, WidgetBuilder> buildRoutes(BuildContext context){
     // endregion
     SpamOrNotScreen.routeName: (context) => SpamOrNotScreen(),
     SearchScreen.routeName: (context) => SearchScreen(),
-
+    ProvidersSelectionScreen.routeName: (context) => ProvidersSelectionScreen(),
     // region development
     DevelopmentLandingScreen.routeName: (context) => DevelopmentLandingScreen(),
     FirestoreTestScreen.routeName: (context) => FirestoreTestScreen(),

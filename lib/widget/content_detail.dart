@@ -1,14 +1,18 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:inked/data/local/mock/mock_news_db.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/remote/user_api.dart';
+import 'package:inked/data/repository/favorite_news_repository.dart';
 import 'package:inked/utils/url_launch.dart';
 import 'package:inked/widget/news_meta_info.dart';
 
 class ContentDetailView extends StatefulWidget {
-  final News news;
   final readOnly;
+  final News news;
 
   ContentDetailView(this.news, {this.readOnly = false});
 
@@ -16,9 +20,27 @@ class ContentDetailView extends StatefulWidget {
   State<StatefulWidget> createState() => _ContentDetailView();
 }
 
-class _ContentDetailView extends State<ContentDetailView> {
+class _ContentDetailView extends State<ContentDetailView>
+    with AfterLayoutMixin<ContentDetailView> {
+  UserApi api;
+  FavoriteNewsRepository repository;
+  bool isFavorite = false;
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    api = UserApi(RemoteApiManager().getDio());
+  }
+
+  _initFavorite() {
+    repository = FavoriteNewsRepository();
+    setState(() {
+      isFavorite = repository.isFavorite(widget.news);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _initFavorite();
     return Container(
         child: Stack(
       children: <Widget>[
@@ -40,8 +62,6 @@ class _ContentDetailView extends State<ContentDetailView> {
     ));
   }
 
-  bool isFavorite = false;
-
   Widget _buildStickyToolbar() {
     return widget.readOnly
         ? SizedBox.shrink()
@@ -52,9 +72,25 @@ class _ContentDetailView extends State<ContentDetailView> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      isFavorite = !isFavorite;
-                    });
+                    isFavorite = !isFavorite;
+                    // todo clean
+                    if (isFavorite) {
+                      // todo clean this
+                      repository.add(widget.news);
+                      api
+                          .postRegisterFavoriteNews(
+                              new UpdateFavoriteNewsRequest(widget.news.id))
+                          .then((value) => {repository.set(value)});
+                    } else {
+                      // todo clean this
+                      repository.remove(widget.news);
+                      api
+                          .removeFavoriteNews(
+                              new UpdateFavoriteNewsRequest(widget.news.id))
+                          .then((value) => {repository.set(value)});
+                    }
+
+                    setState(() {});
                   },
                   icon:
                       Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
@@ -81,7 +117,7 @@ class _ContentDetailView extends State<ContentDetailView> {
   Widget _buildContentSection() {
     return Html(
       data: widget.news.content,
-      onLinkTap: (link){
+      onLinkTap: (link) {
         safelyLaunchURL(link);
       },
       padding: EdgeInsets.all(12),

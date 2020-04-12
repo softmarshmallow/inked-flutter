@@ -217,7 +217,6 @@ const Map<FilterAction, Color> colorMap = {
   FilterAction.ALERT: Colors.redAccent
 };
 
-const focusedColor = const Color(0xffe3e3e3);
 
 class NewsListItem extends StatelessWidget {
   final News data;
@@ -226,7 +225,6 @@ class NewsListItem extends StatelessWidget {
   final bool isFocused;
   final TimeFormatType timeFormatType;
   final Widget bottom;
-  Color _textColor = Colors.black;
   FilterAction _action = FilterAction.IGNORE;
 
   NewsListItem(this.data,
@@ -238,7 +236,6 @@ class NewsListItem extends StatelessWidget {
     // initialize global text color by filter status
     if (data.filterResult != null && data.filterResult.matched) {
       _action = data.filterResult.action;
-      _textColor = colorMap[_action];
       if (shouldPlaySound(data.filterResult.action)) {
         // play only crawled lately in 120 seconds
         if (data.meta.crawlingAt.difference(DateTime.now()).inSeconds.abs() <=
@@ -270,7 +267,7 @@ class NewsListItem extends StatelessWidget {
           _onLongPress(context);
         },
         child: Container(
-            color: isFocused ? focusedColor : null,
+            color: isFocused ? Theme.of(context).splashColor : null,
             padding: EdgeInsets.only(left: 16, top: 8.0, right: 16),
             child: Column(
               children: <Widget>[
@@ -283,7 +280,6 @@ class NewsListItem extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .subtitle1
-                          .copyWith(color: _textColor),
                     ),
                     SizedBox(
                       width: 12,
@@ -298,7 +294,6 @@ class NewsListItem extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .caption
-                              .copyWith(color: _textColor),
                         ),
                         trail != null ? Row(children: trail) : SizedBox.shrink()
                       ],
@@ -347,7 +342,7 @@ class NewsListItem extends StatelessWidget {
 
   Widget _buildContentSection(BuildContext context) {
     var titleTextStyle =
-        Theme.of(context).textTheme.subtitle1.copyWith(color: _textColor);
+        Theme.of(context).textTheme.subtitle1;
     switch (_action) {
       case FilterAction.HIDE:
         break;

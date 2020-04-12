@@ -4,4 +4,15 @@ abstract class BaseRepository<T> {
   set(List<T> data);
 
   bool add(T data);
+
+  bool remove(T data){
+    try{
+      DATA.remove(data);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  seed();
 }

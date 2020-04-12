@@ -18,7 +18,6 @@ class NewsMetaTagsList extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.only(right: 2),
             child: Chip(
-                backgroundColor: Colors.grey[200],
                 label: Text(
                   item,
                   style: textStyle,

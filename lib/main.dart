@@ -4,7 +4,6 @@ import 'package:inked/blocs/livenewslist/bloc.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
-import 'package:inked/dialogs/search_dialog.dart';
 import 'package:inked/screen/search_screen.dart';
 import 'package:inked/screen/splash/splash.dart';
 import 'package:inked/utils/filters/utils.dart';
@@ -31,9 +30,7 @@ class App extends StatelessWidget {
     return MaterialApp(
         title: 'inked inteligence',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.yellow,
-        ),
+        theme: ThemeData(),
         darkTheme: ThemeData.dark(),
         routes: buildRoutes(context),
         home: Splash());
