@@ -19,21 +19,31 @@ abstract class NewsApi {
 
   @GET("/news/recent")
   Future<List<News>> getLastNews(
-      {@Query("page") String page = '1', @Query("count") int count=100});
+      {@Query("page") String page = '1', @Query("count") int count = 100});
 
-  @GET("/news/tag/spam")
-  Future<News> getSpamNews();
+  @GET("/news/tag/spam?tag=UNTAGGED")
+  Future<News> getUntaggedNews();
+
+  @GET("/news/tag/spam?tag=SPAM")
+  Future<News> getSpammedNews();
+
+  @GET("/news/tag/spam?tag=NOTSPAM")
+  Future<News> getNotSpammedNews();
 
   @PATCH("/news/tag/spam")
-  Future<int> markSpamNews(@Body() SpamMarkRequest req);
+  Future<News> markSpamNews(@Body() SpamMarkRequest req);
 }
 
 @JsonSerializable()
-class SpamMarkRequest{
-  SpamMarkRequest({@required this.id,@required  this.is_spam});
+class SpamMarkRequest {
+  SpamMarkRequest(
+      {@required this.id, @required this.tag, @required this.reason});
   String id;
-  bool is_spam;
+  SpamTag tag;
+  String reason;
 
-  factory SpamMarkRequest.fromJson(Map<String, dynamic> json) => _$SpamMarkRequestFromJson(json);
+  factory SpamMarkRequest.fromJson(Map<String, dynamic> json) =>
+      _$SpamMarkRequestFromJson(json);
+
   Map<String, dynamic> toJson() => _$SpamMarkRequestToJson(this);
 }

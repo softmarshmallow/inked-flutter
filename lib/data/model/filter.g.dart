@@ -69,11 +69,12 @@ T _$enumDecodeNullable<T>(
 }
 
 const _$FilterActionEnumMap = {
-  FilterAction.HIDE: 'HIDE',
-  FilterAction.NOTIFY: 'NOTIFY',
-  FilterAction.IGNORE: 'IGNORE',
-  FilterAction.HIGHLIGHT: 'HIGHLIGHT',
   FilterAction.ALERT: 'ALERT',
+  FilterAction.NOTIFY: 'NOTIFY',
+  FilterAction.HIGHLIGHT: 'HIGHLIGHT',
+  FilterAction.SILENCE: 'SILENCE',
+  FilterAction.HIDE: 'HIDE',
+  FilterAction.IGNORE: 'IGNORE',
 };
 
 const _$OperationTypeEnumMap = {

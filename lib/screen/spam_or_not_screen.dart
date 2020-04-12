@@ -122,19 +122,19 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
   _onIsSpamPressed() async {
     _showSnackbar("marked as spam", Colors.deepOrange);
     spamLabelledCountMap['spam'] += 1;
-    await _provideDocumentFeedback(true);
+    await _provideDocumentFeedback(SpamTag.SPAM);
     _loadNewDocument();
   }
 
   _onIsNotSpamPressed() async {
     _showSnackbar("marked as non spam", Colors.blueAccent);
     spamLabelledCountMap['normal'] += 1;
-    await _provideDocumentFeedback(false);
+    await _provideDocumentFeedback(SpamTag.NOTSPAM);
     _loadNewDocument();
   }
 
-  _provideDocumentFeedback(bool isSpam) async {
-    await api.markSpamNews(new SpamMarkRequest(id: news.id, is_spam: isSpam));
+  _provideDocumentFeedback(SpamTag tag) async {
+    await api.markSpamNews(new SpamMarkRequest(id: news.id, tag: tag, reason: "no reason provided")); // todo provide reason
   }
 
   _showSnackbar(String message, Color color) {
@@ -150,7 +150,7 @@ class _SpamOrNotScreenState extends State<SpamOrNotScreen> {
       news = null;
     });
 
-    var newCandidate = await api.getSpamNews();
+    var newCandidate = await api.getUntaggedNews();
     setState(() {
       news = newCandidate;
     });

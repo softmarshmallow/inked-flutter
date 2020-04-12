@@ -62,8 +62,10 @@ class _LiveNewsListView extends State<LiveNewsListView> {
                   ListTile(
                     title: Text("mark as spam"),
                     onTap: () {
-                      widget.api.markSpamNews(
-                          SpamMarkRequest(id: news.id, is_spam: true));
+                      widget.api.markSpamNews(SpamMarkRequest(
+                          id: news.id,
+                          tag: SpamTag.SPAM,
+                          reason: "user clicked mark as spam button"));
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               'Thanks for the feedback. \"${news.title}\" has been marked as spam.')));
@@ -72,8 +74,10 @@ class _LiveNewsListView extends State<LiveNewsListView> {
                   ListTile(
                     title: Text("mark as NOT spam"),
                     onTap: () {
-                      widget.api.markSpamNews(
-                          SpamMarkRequest(id: news.id, is_spam: false));
+                      widget.api.markSpamNews(SpamMarkRequest(
+                          id: news.id,
+                          tag: SpamTag.NOTSPAM,
+                          reason: "user clicked mark as notspam button"));
                       Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
                               'Thanks for the feedback. \"${news.title}\" has been marked as NOT spam.')));
@@ -176,7 +180,10 @@ class NewsListView extends StatelessWidget {
         Scaffold.of(context).showSnackBar(SnackBar(
             content: Text(
                 'Thanks for the feedback. \"${data.title}\" has been marked as spam.')));
-        api.markSpamNews(SpamMarkRequest(id: data.id, is_spam: true));
+        api.markSpamNews(SpamMarkRequest(
+            id: data.id,
+            tag: SpamTag.SPAM,
+            reason: "user clicked mark as spam button"));
       },
     );
   }
@@ -345,7 +352,7 @@ class NewsListItem extends StatelessWidget {
       case FilterAction.HIDE:
         break;
       case FilterAction.IGNORE:
-      // use default value
+        // use default value
         break;
       case FilterAction.NOTIFY:
         titleTextStyle = titleTextStyle.copyWith(

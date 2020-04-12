@@ -67,7 +67,7 @@ class _TokenFilterTesterState extends State<TokenFilterTester> {
             RaisedButton(
               child: Text("load other news"),
               onPressed: () async {
-                var fetched = await api.getSpamNews();
+                var fetched = await api.getUntaggedNews();
                 setState(() {
                   bloc.add(TestNewsUpdateEvent(fetched));
                 });

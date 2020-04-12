@@ -9,15 +9,55 @@ part of 'news_api.dart';
 SpamMarkRequest _$SpamMarkRequestFromJson(Map<String, dynamic> json) {
   return SpamMarkRequest(
     id: json['id'] as String,
-    is_spam: json['is_spam'] as bool,
+    tag: _$enumDecodeNullable(_$SpamTagEnumMap, json['tag']),
+    reason: json['reason'] as String,
   );
 }
 
 Map<String, dynamic> _$SpamMarkRequestToJson(SpamMarkRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'is_spam': instance.is_spam,
+      'tag': _$SpamTagEnumMap[instance.tag],
+      'reason': instance.reason,
     };
+
+T _$enumDecode<T>(
+  Map<T, dynamic> enumValues,
+  dynamic source, {
+  T unknownValue,
+}) {
+  if (source == null) {
+    throw ArgumentError('A value must be provided. Supported values: '
+        '${enumValues.values.join(', ')}');
+  }
+
+  final value = enumValues.entries
+      .singleWhere((e) => e.value == source, orElse: () => null)
+      ?.key;
+
+  if (value == null && unknownValue == null) {
+    throw ArgumentError('`$source` is not one of the supported values: '
+        '${enumValues.values.join(', ')}');
+  }
+  return value ?? unknownValue;
+}
+
+T _$enumDecodeNullable<T>(
+  Map<T, dynamic> enumValues,
+  dynamic source, {
+  T unknownValue,
+}) {
+  if (source == null) {
+    return null;
+  }
+  return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
+}
+
+const _$SpamTagEnumMap = {
+  SpamTag.SPAM: 'SPAM',
+  SpamTag.NOTSPAM: 'NOTSPAM',
+  SpamTag.UNTAGGED: 'UNTAGGED',
+};
 
 // **************************************************************************
 // RetrofitGenerator
@@ -92,12 +132,48 @@ class _NewsApi implements NewsApi {
   }
 
   @override
-  getSpamNews() async {
+  getUntaggedNews() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final Response<Map<String, dynamic>> _result = await _dio.request(
-        '/news/tag/spam',
+        '/news/tag/spam?tag=UNTAGGED',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    final value = News.fromJson(_result.data);
+    return Future.value(value);
+  }
+
+  @override
+  getSpammedNews() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final Response<Map<String, dynamic>> _result = await _dio.request(
+        '/news/tag/spam?tag=SPAM',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    final value = News.fromJson(_result.data);
+    return Future.value(value);
+  }
+
+  @override
+  getNotSpammedNews() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final Response<Map<String, dynamic>> _result = await _dio.request(
+        '/news/tag/spam?tag=NOTSPAM',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'GET',
@@ -116,7 +192,8 @@ class _NewsApi implements NewsApi {
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(req?.toJson() ?? <String, dynamic>{});
-    final Response<int> _result = await _dio.request('/news/tag/spam',
+    final Response<Map<String, dynamic>> _result = await _dio.request(
+        '/news/tag/spam',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'PATCH',
@@ -124,7 +201,7 @@ class _NewsApi implements NewsApi {
             extra: _extra,
             baseUrl: baseUrl),
         data: _data);
-    final value = _result.data;
+    final value = News.fromJson(_result.data);
     return Future.value(value);
   }
 }
