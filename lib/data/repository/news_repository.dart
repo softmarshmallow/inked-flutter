@@ -2,6 +2,7 @@ import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/data/repository/base.dart';
 import 'package:inked/data/repository/news_filter_repositry.dart';
+import 'package:inked/data/repository/providers_selection_repository.dart';
 import 'package:inked/utils/filters/terms_filter_processor.dart';
 
 const MAX_NEWS_MEMORY_COUNT = 1000;
@@ -18,47 +19,13 @@ class NewsRepository extends BaseRepository<News> {
 
   // endregion
 
-  var excludePublisher = [
-    "부산일보",
-    "국민일보",
-    "중앙일보",
-    "서울신문",
-    "연합뉴스TV",
-    "경향신문",
-    "SBS",
-    "MBC",
-    "MBN",
-    "머니S",
-    "노컷뉴스",
-    "세계일보",
-    "스포츠서울",
-    "스포츠조선",
-    "일간스포츠",
-    "인포스탁",
-    "파이낸셜",
-    "파이낸셜뉴스",
-    "미디어오늘",
-    "아이뉴스24",
-    "강원일보",
-    "KBS",
-    "스포츠동아",
-    "한겨레",
-    "프레시안",
-    "동아사이언스",
-    "오마이뉴스",
-    "채널A",
-    "매일신문",
-    "JTBC",
-    "한국경제TV",
-    "데일리안",
-    "코메디닷컴",
-    "조세일보"
-  ];
-
   bool add(News newsItem) {
     // quick fix todo -> migrate
-    if (excludePublisher.contains(newsItem.provider)) {
-      return false;
+    var providersSetting = ProvidersSelectionRepository().DATA;
+    for (var pi in providersSetting) {
+      if (!pi.enabled && pi.provider == newsItem.provider) {
+        return false;
+      }
     }
 
     var replaced = replace(newsItem);
@@ -104,7 +71,7 @@ class NewsRepository extends BaseRepository<News> {
         true,
         action: FilterAction.SILENCE,
       );
-    }else{
+    } else {
       onReplaced(news);
     }
     replace(news);

@@ -17,8 +17,8 @@ class _ProvidersSelectionScreenState extends State<ProvidersSelectionScreen>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    repository = ProvidersSelectionRepository(context);
-    repository.loadProvidersSettings().then((value) {
+    repository = ProvidersSelectionRepository();
+    repository.loadProvidersSettings(context).then((value) {
       setState(() {
         providerSettings = value;
       });
@@ -46,7 +46,7 @@ class _ProvidersSelectionScreenState extends State<ProvidersSelectionScreen>
                     } else {
                       await repository.disable(data.provider);
                     }
-                    repository.loadProvidersSettings().then((value) {
+                    repository.loadProvidersSettings(context).then((value) {
                       setState(() {
                         providerSettings = value;
                       });
