@@ -48,13 +48,6 @@ Widget buildMainDrawer(BuildContext context) {
           },
         ),
         ListTile(
-          leading: Icon(Icons.filter_list),
-          title: Text('filter testing'),
-          onTap: () {
-            Navigator.of(context).pushNamed(FilterTestingScreen.routeName);
-          },
-        ),
-        ListTile(
           leading: Icon(Icons.done_all),
           title: Text('spam or not'),
           onTap: () {

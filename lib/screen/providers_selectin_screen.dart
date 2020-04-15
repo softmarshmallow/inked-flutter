@@ -29,7 +29,7 @@ class _ProvidersSelectionScreenState extends State<ProvidersSelectionScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("prociders selection"),
+        title: Text("providers"),
       ),
       body: SingleChildScrollView(
         child: ListView.builder(
