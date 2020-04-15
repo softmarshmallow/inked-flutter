@@ -16,11 +16,6 @@
 </head>
 <body>
 
-<!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-app.js"></script>
-<!--<script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-analytics.js"></script>-->
-<!--<script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-auth.js"></script>-->
-<script src="https://www.gstatic.com/firebasejs/7.9.1/firebase-firestore.js"></script>
 <script src="main.dart.js" type="application/javascript"></script>
 
 
@@ -28,24 +23,12 @@
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/flutter_service_worker.js');
-      });
-    }
+<!--    if ('serviceWorker' in navigator) {-->
+<!--      window.addEventListener('load', function () {-->
+<!--        navigator.serviceWorker.register('/flutter_service_worker.js');-->
+<!--      });-->
+<!--    }-->
   </script>
 
-<script>
-    // See: https://support.google.com/firebase/answer/7015592
-    var firebaseConfig = {
-      apiKey: "AIzaSyBKTFm__PODFS5Yr3qrkWGLixXlnfyb6uo",
-      authDomain: "inked-frontent.firebaseapp.com",
-      databaseURL: "https://inked-frontent.firebaseio.com",
-      projectId: "inked-frontent",
-      storageBucket: "inked-frontent.appspot.com",
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-  </script>
 </body>
 </html>

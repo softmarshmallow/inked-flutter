@@ -28,7 +28,7 @@ class ProvidersSelectionRepository extends BaseRepository<ProviderSetting>{
   ProvidersSelectionRepository._internal();
   // endregion
 
-  UserApi api = UserApi(RemoteApiManager().getDio());
+  UserApi api;
   BuildContext _context;
   setContext(BuildContext context){
     _context = context;
@@ -36,9 +36,11 @@ class ProvidersSelectionRepository extends BaseRepository<ProviderSetting>{
 
   Future<List<ProviderSetting>> loadProvidersSettings (BuildContext context) async {
     List<ProviderSetting> settings = [];
+    print("start - loadProvidersSettings");
     var allProviders = await loadProvidersList(context);
+    api = UserApi(RemoteApiManager().getDio());
     var remoteProviderSettings = await api.getProviderSettings();
-    print("AAA");
+    print("loadProvidersSettings");
     print(remoteProviderSettings);
     settings.addAll(remoteProviderSettings);
     for (var p in allProviders){
