@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:inked/data/model/provider_setting.dart';
+import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/remote/user_api.dart';
 import 'package:inked/data/repository/base.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const EXCLUDED_PROVIDERS_KEY = "EXCLUDED_PROVIDERS_KEY";
 
@@ -27,42 +28,36 @@ class ProvidersSelectionRepository extends BaseRepository<ProviderSetting>{
   ProvidersSelectionRepository._internal();
   // endregion
 
-  SharedPreferences _prefs;
-
+  UserApi api = UserApi(RemoteApiManager().getDio());
   BuildContext _context;
   setContext(BuildContext context){
     _context = context;
   }
 
-  Future<List<String>> _setExcludedProviderList (List<String> list) async {
-    _prefs = await SharedPreferences.getInstance();
-    _prefs.setStringList(EXCLUDED_PROVIDERS_KEY, list);
-    return list;
-  }
-
-  Future<List<String>> _loadExcludedProviderList () async {
-    _prefs = await SharedPreferences.getInstance();
-    return _prefs.getStringList(EXCLUDED_PROVIDERS_KEY) ?? [];
-  }
-
   Future<List<ProviderSetting>> loadProvidersSettings (BuildContext context) async {
     List<ProviderSetting> settings = [];
     var allProviders = await loadProvidersList(context);
-    var excluded = await _loadExcludedProviderList();
+    var remoteProviderSettings = await api.getProviderSettings();
+    print("AAA");
+    print(remoteProviderSettings);
+    settings.addAll(remoteProviderSettings);
     for (var p in allProviders){
-      bool enabled = !excluded.contains(p);
-      settings.add(new ProviderSetting(provider: p, enabled: enabled));
+      var localSetting = new ProviderSetting(provider: p, availability: ProviderAvailabilityType.ENABLED);
+      if ( !settings.contains(localSetting)) {
+        settings.add(localSetting);
+      }
     }
     return settings;
   }
   
   enable(String provider)  async {
-    var updated = (await _loadExcludedProviderList())..remove(provider);
-    await _setExcludedProviderList(updated);
+    var updated = await api.postUpdateProviderSetting(ProviderSetting(provider: provider, availability: ProviderAvailabilityType.ENABLED));
+    DATA = updated;
   }
 
   disable(String provider)  async {
-    await _setExcludedProviderList((await _loadExcludedProviderList())..add(provider));
+    var updated = await api.postUpdateProviderSetting(ProviderSetting(provider: provider, availability: ProviderAvailabilityType.DISABLED));
+    DATA = updated;
   }
 
   @override
@@ -80,18 +75,6 @@ class ProvidersSelectionRepository extends BaseRepository<ProviderSetting>{
     loadProvidersSettings(_context).then((value){
       DATA = value;
     });
-  }
-
-  @override
-  set(List<ProviderSetting> data) {
-    DATA = data;
-    var excludeList = [];
-    for (var d in DATA){
-      if (!d.enabled) {
-        excludeList.add(d.provider);
-      }
-    }
-    _setExcludedProviderList(excludeList);
   }
 }
 

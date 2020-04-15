@@ -1,7 +1,9 @@
 abstract class BaseRepository<T> {
   List<T> DATA = [];
 
-  set(List<T> data);
+  set(List<T> data){
+    DATA = data;
+  }
 
   bool add(T data);
 

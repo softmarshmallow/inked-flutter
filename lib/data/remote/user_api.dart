@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/data/model/provider_setting.dart';
 import 'package:inked/data/model/user.dart';
 import 'package:inked/utils/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -23,6 +24,14 @@ abstract class UserApi {
 
   @DELETE("/user/news/favorite")
   Future<List<News>> removeFavoriteNews(@Body() UpdateFavoriteNewsRequest request);
+
+
+  @GET("/user/settings/provider")
+  Future<List<ProviderSetting>> getProviderSettings();
+
+  @POST("/user/settings/provider")
+  Future<List<ProviderSetting>> postUpdateProviderSetting(@Body() ProviderSetting request);
+
 }
 
 @JsonSerializable()
