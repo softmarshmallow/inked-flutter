@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/blocs/livenewslist/bloc.dart';
-import 'package:inked/blocs/token_filter_tester/bloc.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
-import 'package:inked/data/remote/base.dart';
 import 'package:inked/data/remote/news_api.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/constants.dart';
@@ -146,6 +144,7 @@ class NewsListView extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToFocused());
     this.context = context;
     return Scrollbar(
+        isAlwaysShown: true,
         child: news.isEmpty
             ? Text("loading..")
             : ScrollablePositionedList.builder(
@@ -217,7 +216,6 @@ const Map<FilterAction, Color> colorMap = {
   FilterAction.ALERT: Colors.redAccent
 };
 
-
 class NewsListItem extends StatelessWidget {
   final News data;
   NewsListItemActions actions;
@@ -275,12 +273,8 @@ class NewsListItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      formatTimeHuman(data.time, timeFormatType),
-                      style: Theme.of(context)
-                          .textTheme
-                          .subtitle1
-                    ),
+                    Text(formatTimeHuman(data.time, timeFormatType),
+                        style: Theme.of(context).textTheme.subtitle1),
                     SizedBox(
                       width: 12,
                     ),
@@ -289,12 +283,8 @@ class NewsListItem extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Text(
-                          "${data.provider}",
-                          style: Theme.of(context)
-                              .textTheme
-                              .caption
-                        ),
+                        Text("${data.provider}",
+                            style: Theme.of(context).textTheme.caption),
                         trail != null ? Row(children: trail) : SizedBox.shrink()
                       ],
                     ),
@@ -341,8 +331,7 @@ class NewsListItem extends StatelessWidget {
   }
 
   Widget _buildContentSection(BuildContext context) {
-    var titleTextStyle =
-        Theme.of(context).textTheme.subtitle1;
+    var titleTextStyle = Theme.of(context).textTheme.subtitle1;
     switch (_action) {
       case FilterAction.HIDE:
         break;

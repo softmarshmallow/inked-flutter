@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
 import 'package:inked/utils/elasticsearch/elasticsearch.dart';
 import 'package:inked/utils/elasticsearch/model.dart';
-import 'package:inked/utils/text_highlight/highlighted_text.dart';
 import 'package:inked/widget/appbar_linear_progress_indicator.dart';
 import 'package:inked/widget/news_list.dart';
 
@@ -39,6 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
               : null,
         ),
         body: Scrollbar(
+            isAlwaysShown: true,
             controller: _scrollController,
             child: SingleChildScrollView(
               controller: _scrollController,

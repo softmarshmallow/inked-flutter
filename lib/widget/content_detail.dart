@@ -45,6 +45,7 @@ class _ContentDetailView extends State<ContentDetailView>
         child: Stack(
       children: <Widget>[
         Scrollbar(
+          isAlwaysShown: true,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
