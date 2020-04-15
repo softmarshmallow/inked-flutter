@@ -44,17 +44,19 @@ class _ContentDetailView extends State<ContentDetailView>
     return Container(
         child: Stack(
       children: <Widget>[
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _buildTitleSection(),
-              Divider(),
-              _buildContentSection(),
-              Divider(),
-              _buildFooterSection()
-            ],
+        Scrollbar(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                _buildTitleSection(),
+                Divider(),
+                _buildContentSection(),
+                Divider(),
+                _buildFooterSection()
+              ],
+            ),
           ),
         ),
         _buildStickyToolbar(),
