@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:inked/screen/development/api_test.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/development/socketio_development_screen.dart';
 import 'package:inked/screen/development/tab_bar_demo.dart';
@@ -57,6 +58,12 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
               title: Text('tab bar'),
               onTap: () {
                 Navigator.of(context).pushNamed(TabBarDemoScreen.routeName);
+              },
+            ),
+            ListTile(
+              title: Text('api tests'),
+              onTap: () {
+                Navigator.of(context).pushNamed(ApiTestScreen.routeName);
               },
             ),
           ],

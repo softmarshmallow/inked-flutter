@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:inked/screen/content_detail_screen.dart';
+import 'package:inked/screen/development/api_test.dart';
 import 'package:inked/screen/development/development_landing_screen.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/development/socketio_development_screen.dart';
@@ -33,6 +34,7 @@ Map<String, WidgetBuilder> buildRoutes(BuildContext context){
     FirestoreTestScreen.routeName: (context) => FirestoreTestScreen(),
     SocketioDevelopmentScreen.routeName: (context) => SocketioDevelopmentScreen(),
     TabBarDemoScreen.routeName: (context) => TabBarDemoScreen(),
+    ApiTestScreen.routeName: (context) => ApiTestScreen(),
     // endregion
   };
 }
