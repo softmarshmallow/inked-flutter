@@ -21,7 +21,8 @@ class RemoteApiManager {
         connectTimeout: 5000,
         receiveTimeout: 8000,
         baseUrl: BASE_API_URL,
-        headers: {"Authorization": "Bearer ${DotEnv().env['UID']}"});
+        headers: {"Authorization": "Bearer ${DotEnv().env['UID']}"}
+        );
     Dio dio = new Dio(options);
     _dio = dio;
     return _dio;

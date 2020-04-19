@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:inked/data/model/filter.dart';
 import 'package:inked/data/model/news.dart';
+import 'package:inked/data/remote/base.dart';
+import 'package:inked/data/remote/search_api.dart';
+import 'package:inked/remote_ui/layouts/search.layout.dart';
 import 'package:inked/screen/content_detail_screen.dart';
 import 'package:inked/utils/date/datetime_utls.dart';
 import 'package:inked/utils/elasticsearch/elasticsearch.dart';
@@ -18,10 +21,31 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  String _term;
+  String _term = "";
+  String lastSearchTerm = "";
+
+  String get term {
+    return _term;
+  }
+
+  set term(String v) {
+    setState(() {
+      _term = v;
+      isInitialState = v == "";
+      if (term != lastSearchTerm) {
+        // reset search results
+        searchResults = null;
+      }
+    });
+  }
+
+  TextEditingController _inputController = TextEditingController();
   SearchResponse<NewsDocumentResult> searchResults;
+  List<SearchLayoutBase> blankLayout;
   bool _loading = false;
   int page = 1;
+  bool isInitialState = true;
+  var api = SearchApi(RemoteApiManager().getDio());
   final ScrollController _scrollController = ScrollController();
   DateTime startDate = DateTime.now().subtract(Duration(days: 7));
 
@@ -42,12 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Column(
-                children: <Widget>[
-                  _buildSearchInput(),
-                  _buildSearchResultMeta(),
-                  _buildList(),
-                  _buildPagination()
-                ],
+                children: <Widget>[_buildSearchInput(), _buildBody()],
               ),
             )));
   }
@@ -55,7 +74,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildSearchResultMeta() {
     var child;
     if (searchResults == null) {
-      child = Text("no result for search term: $_term");
+      child = Text(
+          "no result for search term: $term (hit enter or press search to search)");
     } else {
       child = Text(
           "page: ${page} total : ${searchResults.total} took: ${searchResults.took / 100} seconds, maxScore: ${searchResults.maxScore}");
@@ -66,7 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildList() {
+  Widget _buildSearchResultList() {
     if (searchResults != null && searchResults.documents.length > 0) {
       return ListView.builder(
           itemBuilder: (c, i) {
@@ -134,15 +154,14 @@ class _SearchScreenState extends State<SearchScreen> {
             Container(
               width: MediaQuery.of(context).size.width,
               child: TextField(
+                controller: _inputController,
                 autofocus: true,
                 decoration: InputDecoration(
                     filled: true,
                     border: InputBorder.none,
                     hintText: 'Enter a search term'),
                 onChanged: (s) {
-                  setState(() {
-                    _term = s;
-                  });
+                  term = s;
                 },
                 onSubmitted: (s) {
                   _search();
@@ -164,13 +183,83 @@ class _SearchScreenState extends State<SearchScreen> {
         ));
   }
 
-  Widget _buildRecentHistorySelection(){
-
+  Widget _buildBody() {
+    return isInitialState ? _buildInitialState() : _buildSearchState();
   }
 
+  Widget _buildSearchState() {
+    return Column(
+      children: <Widget>[
+        _buildSearchResultMeta(),
+        _buildSearchResultList(),
+        _buildPagination()
+      ],
+    );
+  }
 
-  Widget _buildCustomDatePicker(){
-    if(useCustomDate){
+  Widget _buildInitialState() {
+    api.getBlank().then((value) {
+      setState(() {
+        blankLayout = value;
+      });
+    });
+
+    if (blankLayout == null) {
+      return CircularProgressIndicator();
+    }
+
+    if (blankLayout.length == 0) {
+      return Text("no search suggestions");
+    }
+
+    return ListView.builder(
+      itemBuilder: (c, i) {
+        var item = blankLayout[i];
+        String t = item.title.text;
+        return ListTile(
+          title: Text(t),
+          onTap: () {
+            term = t;
+            _inputController.text = term;
+            _search();
+          },
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("remove search history"),
+                    content: Text("remove \"${t}\" from history?"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("cancel"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("remove"),
+                        onPressed: () {
+                          api.removeSearchHistory(CrudSearchHistoryRequest(t));
+                          setState(() {}); // reload black state
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                });
+          },
+        );
+      },
+      itemCount: blankLayout.length,
+      shrinkWrap: true,
+    );
+  }
+
+  Widget _buildRecentHistorySelection() {}
+
+  Widget _buildCustomDatePicker() {
+    if (useCustomDate) {
       return Container(
         child: FlatButton(
           child: Text(
@@ -193,19 +282,18 @@ class _SearchScreenState extends State<SearchScreen> {
           },
         ),
       );
-    }else{
+    } else {
       return SizedBox.shrink();
     }
   }
 
-
   static const Map<String, Duration> durationMap = {
     "1 hour": Duration(hours: 1),
-    "1 day":  Duration(days: 1),
-    "1 week":  Duration(days: 7),
-    "2 weeks":  Duration(days: 14),
-    "1 month":  Duration(days: 30),
-    "3 months":  Duration(days: 90),
+    "1 day": Duration(days: 1),
+    "1 week": Duration(days: 7),
+    "2 weeks": Duration(days: 14),
+    "1 month": Duration(days: 30),
+    "3 months": Duration(days: 90),
     "custom": null
   };
   static const defaultKey = "2 weeks";
@@ -221,7 +309,7 @@ class _SearchScreenState extends State<SearchScreen> {
           durationKey = value;
           duration = durationMap[value];
           useCustomDate = value == "custom";
-          if(! useCustomDate){
+          if (!useCustomDate) {
             startDate = DateTime.now().subtract(duration);
           }
         });
@@ -234,16 +322,17 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   _search() async {
-    print("search started with term of '$_term'");
+    lastSearchTerm = term;
+    print("search started with term of '$term'");
 
     var esHost = DotEnv().env["ES_HOST"];
-
+    api.createSearchHistory(CrudSearchHistoryRequest(term));
     setState(() {
       _loading = true;
     });
 
     searchResults = await Elasticsearch(esHost)
-        .searchMultiMatch(_term, page: page, timeFrom: startDate);
+        .searchMultiMatch(term, page: page, timeFrom: startDate);
     setState(() {
       _loading = false;
       searchResults = searchResults;
