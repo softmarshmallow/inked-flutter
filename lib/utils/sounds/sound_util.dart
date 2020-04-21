@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:inked/data/remote/lite_connector.dart';
 
 AudioPlayer audioPlayer = AudioPlayer();
 
@@ -8,5 +9,6 @@ playOnceInLifetime(String id, String file) async {
     var res = await audioPlayer.play(file);
     print("played sound $file -> $res");
     _played.add(id);
+    LiteAppConnector().alertOnLiteApp(id);
   }
 }

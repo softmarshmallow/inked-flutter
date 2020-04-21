@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:inked/data/remote/lite_connector.dart';
 import 'package:inked/screen/development/api_test.dart';
 import 'package:inked/screen/development/firestore_test_screen.dart';
 import 'package:inked/screen/development/socketio_development_screen.dart';
@@ -64,6 +65,12 @@ class _DevelopmentLandingScreenState extends State<DevelopmentLandingScreen> {
               title: Text('api tests'),
               onTap: () {
                 Navigator.of(context).pushNamed(ApiTestScreen.routeName);
+              },
+            ),
+            ListTile(
+              title: Text('lite-app alert'),
+              onTap: () {
+                LiteAppConnector().alertOnLiteApp("test ${DateTime.now().toIso8601String()}"); // for not conflicting id
               },
             ),
           ],
