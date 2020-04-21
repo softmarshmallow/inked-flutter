@@ -11,6 +11,10 @@ Supports
 * ✅ Android / ios
 * Linux (not tested yet) (no audio support)
 
+## TODO
+* deploy test server on heroku for developers' test
+
+
 ## Getting Started
 
 ### Code generation
