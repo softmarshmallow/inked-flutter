@@ -30,9 +30,18 @@ class RealtimeNewsReceiver {
     _socket = IO.io('http://13.209.232.176:3001/client', <String, dynamic>{
       'transports': ['websocket'],
     });
+    // region life cycle
     _socket.on('connect', (_) {
       print("socket io client connected");
     });
+    _socket.on('connecting', (data) => print("connecting"));
+    _socket.on('reconnect', (data) => print("reconnect"));
+    _socket.on('reconnect_attempt', (data) => print("reconnect_attempt"));
+    _socket.on('reconnect_failed', (data) => print("reconnect_failed"));
+    _socket.on('reconnect_error', (data) => print("reconnect_error"));
+    _socket.on('reconnecting', (data) => print("reconnecting"));
+    // endregion life cycle
+
 
     _socket.on("news", (event) {
 //      print(event);
