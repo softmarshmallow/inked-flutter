@@ -39,3 +39,10 @@ lib/generated_plugin_registrant.dart
 
 # credentials
 .env*
+
+
+*.cache
+
+.last_build_id
+android/app/release/app-release.apk
+android/app/release/output.json
